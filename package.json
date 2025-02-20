@@ -1,0 +1,26 @@
+{
+  "name": "mina-aes",
+  "version": "1.0.0",
+  "description": "A provable AES implementation for the Mina Protocol",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scaraven/mina-aes.git"
+  },
+  "author": "scaraven",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scaraven/mina-aes/issues"
+  },
+  "homepage": "https://github.com/scaraven/mina-aes#readme",
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
