@@ -1,11 +1,11 @@
-import { Field, Struct, Gadgets } from 'o1js';
+import { Field, Struct, Gadgets } from "o1js";
 
 /**
  * A struct that represents 16 bytes packed into a single Field element.
  */
 export class Byte16 extends Struct({
   top: Field,
-  bot: Field
+  bot: Field,
 }) {
   // 2^128 as a Field constant for constraint checks
   static readonly TWO64 = Field(BigInt(1) << BigInt(64));
@@ -34,9 +34,11 @@ export class Byte16 extends Struct({
     let top = BigInt(0);
     let bot = BigInt(0);
     for (let i = 0; i < 16; i++) {
-      let byte = bytes[i];
+      const byte = bytes[i];
       if (byte < 0 || byte > 255) {
-        throw new Error(`Byte value ${byte} is out of range. Must be between 0 and 255.`);
+        throw new Error(
+          `Byte value ${byte} is out of range. Must be between 0 and 255.`,
+        );
       }
 
       if (i < 8) {
@@ -70,12 +72,28 @@ export class Byte16 extends Struct({
 
   toColumns(): Field[][] {
     // Get first column
-    let arr: Field[][] = [];
+    const arr: Field[][] = [];
     for (let i = 0; i < 4; i++) {
-      let first = Gadgets.and(Gadgets.rightShift64(this.top, (7 - i) * 8), Field(0xff), 64);
-      let second = Gadgets.and(Gadgets.rightShift64(this.top, (3 - i) * 8), Field(0xff), 64);
-      let third = Gadgets.and(Gadgets.rightShift64(this.bot, (7 - i) * 8), Field(0xff), 64);
-      let fourth = Gadgets.and(Gadgets.rightShift64(this.bot, (3 - i) * 8), Field(0xff), 64);
+      const first = Gadgets.and(
+        Gadgets.rightShift64(this.top, (7 - i) * 8),
+        Field(0xff),
+        64,
+      );
+      const second = Gadgets.and(
+        Gadgets.rightShift64(this.top, (3 - i) * 8),
+        Field(0xff),
+        64,
+      );
+      const third = Gadgets.and(
+        Gadgets.rightShift64(this.bot, (7 - i) * 8),
+        Field(0xff),
+        64,
+      );
+      const fourth = Gadgets.and(
+        Gadgets.rightShift64(this.bot, (3 - i) * 8),
+        Field(0xff),
+        64,
+      );
 
       arr.push([first, second, third, fourth]);
     }
@@ -114,6 +132,9 @@ export class Byte16 extends Struct({
    */
   static xor(a: Byte16, b: Byte16): Byte16 {
     // AES uses 128 bit sizes for all operations
-    return new Byte16(Gadgets.xor(a.top, b.top, 64), Gadgets.xor(a.bot, b.bot, 64));
+    return new Byte16(
+      Gadgets.xor(a.top, b.top, 64),
+      Gadgets.xor(a.bot, b.bot, 64),
+    );
   }
 }

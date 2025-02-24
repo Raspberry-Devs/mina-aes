@@ -3,3 +3,6 @@ npm-debug.log
 
 # Ignore build files
 build/
+
+# Eslint cache
+.eslintcache
