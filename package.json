@@ -2,15 +2,17 @@
   "name": "mina-aes",
   "version": "1.0.0",
   "description": "A provable AES implementation for the Mina Protocol",
-  "main": "index.js",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node build/index.js",
+    "start": "node build/src/index.js",
     "dev": "ts-node src/index.ts",
-    "test": "echo 'No tests yet!'",
+    "test": "jest",
     "prepare": "husky install",
-    "lint": "npx eslint . --max-warnings=0 --fix",
-    "format": "npx prettier --write \"**/*.{ts,js}\""
+    "lint": "npx eslint src --max-warnings=0 --fix",
+    "format": "npx prettier --write \"**/*.ts\"",
+    "clean": "rm -rf build"
   },
   "repository": {
     "type": "git",
@@ -23,20 +25,25 @@
   },
   "homepage": "https://github.com/scaraven/mina-aes#readme",
   "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-typescript": "^7.26.0",
     "@eslint/js": "^9.21.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
     "eslint": "^9.21.0",
     "globals": "^16.0.0",
     "husky": "^8.0.0",
+    "jest": "^29.7.0",
     "prettier": "^3.5.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.25.0"
   },
   "lint-staged": {
-    "*.{ts,js}": [
+    "*.{ts}": [
       "prettier -c",
-      "eslint --max-warnings=0"
+      "eslint src --max-warnings=0",
+      "npm run test"
     ]
   },
   "dependencies": {
