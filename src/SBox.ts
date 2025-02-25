@@ -19,7 +19,6 @@ function sbox(input: Field): Field {
 
     for (let j = 0; j < 256; j++) {
       // This is either 0 or 1, depending on whether we have accessed the correct index
-      //TODO: Use map for more efficiency?
       const correct_index = byte.equals(Field(j)).toField();
 
       byte_output = byte_output.add(sbox.value[j].mul(correct_index));
