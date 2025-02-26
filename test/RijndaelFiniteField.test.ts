@@ -53,3 +53,58 @@ describe("RijndaelFiniteField Addition", () => {
     expect(result.toBigInt()).toEqual(0n);
   });
 });
+
+describe("RijndaelFiniteField Multiplication", () => {
+  it("should perform multiplication correctly", () => {
+    const a = new RijndaelFiniteField(0b1100n); // 12
+    const b = new RijndaelFiniteField(0b1010n); // 10
+
+    const result = a.mult(b);
+    expect(Number(result.toBigInt())).toEqual(120);
+
+    const c = new RijndaelFiniteField(0x1cn); // 28
+    const d = new RijndaelFiniteField(0xffn); // 255
+    expect(Number(c.mult(d).toBigInt())).toEqual(1);
+
+    const e = new RijndaelFiniteField(0x0n);
+    const f = new RijndaelFiniteField(0x1n);
+    for (let i = 0; i < 256; i++) {
+      const g = new RijndaelFiniteField(i);
+      expect(Number(e.mult(g).toBigInt())).toEqual(0);
+      expect(Number(f.mult(g).toBigInt())).toEqual(i);
+    }
+  });
+  it("should perform single x multiplication correctly for non-high bit numbers", () => {
+    const a = new RijndaelFiniteField(0b1100n); // 12
+
+    const result = RijndaelFiniteField._multOne(a.toFields()[0]);
+    expect(Number(result.toBigInt())).toEqual(24);
+
+    const b = new RijndaelFiniteField(0b1010n); // 10
+    const result2 = RijndaelFiniteField._multOne(b.toFields()[0]);
+    expect(Number(result2.toBigInt())).toEqual(20);
+
+    const c = new RijndaelFiniteField(0b1111000n); // 120
+    const result3 = RijndaelFiniteField._multOne(c.toFields()[0]);
+    expect(Number(result3.toBigInt())).toEqual(240);
+
+    const d = new RijndaelFiniteField(0b0n); // 0
+    const result4 = RijndaelFiniteField._multOne(d.toFields()[0]);
+    expect(Number(result4.toBigInt())).toEqual(0);
+  });
+
+  it("should perform single x multiplication correctly for high bit numbers", () => {
+    const a = new RijndaelFiniteField(0b10000000n); // 128
+
+    const result = RijndaelFiniteField._multOne(a.toFields()[0]);
+    expect(Number(result.toBigInt())).toEqual(27);
+
+    const b = new RijndaelFiniteField(0b11000000n); // 192
+    const result2 = RijndaelFiniteField._multOne(b.toFields()[0]);
+    expect(Number(result2.toBigInt())).toEqual(155);
+
+    const c = new RijndaelFiniteField(0b11000001n); // 193
+    const result3 = RijndaelFiniteField._multOne(c.toFields()[0]);
+    expect(Number(result3.toBigInt())).toEqual(153);
+  });
+});
