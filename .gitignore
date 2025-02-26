@@ -6,3 +6,6 @@ build/
 
 # Eslint cache
 .eslintcache
+
+# VSCode
+.vscode
