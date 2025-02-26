@@ -1,9 +1,6 @@
-import { verify } from "o1js";
+import { verify, Field } from "o1js";
 import { Byte16 } from "../primitives/Bytes.js";
-import {
-  IterativeAes128,
-  IterativeAES128PublicInput as AESPublicInput,
-} from "../implementations/IterativeAES128.js";
+import { RecursiveAes128 } from "../implementations/RecursiveAES128.js";
 
 // "Crypto is magic!"
 const message = Byte16.fromBytes([
@@ -64,22 +61,37 @@ const roundKeys = [
 ];
 
 async function main() {
-  console.log("Compiling AES zkProgram...");
-  const { verificationKey } = await IterativeAes128.compile();
-  console.log("AES zkProgram compiled successfully!");
+  console.log("Compiling Recursive AES zkProgram...");
+  const { verificationKey } = await RecursiveAes128.compile();
+  console.log("Recursive AES zkProgram compiled!");
 
-  console.log("Generating AES proof...");
-  const input = new AESPublicInput({ cipher });
-  const { proof } = await IterativeAes128.verifyAES128(
-    input,
+  console.log("Generating AES proof for round 0...");
+  let proof = await RecursiveAes128.addRoundKey(
+    { round: Field(0), state: message },
     message,
-    roundKeys,
+    roundKeys[0],
   );
-  console.log("Proof generated successfully!");
+
+  for (let i = 1; i < 10; i++) {
+    console.log(`Generating proof for round ${i}...`);
+    proof = await RecursiveAes128.mainRound(
+      { round: Field(i), state: new Byte16(Field(0), Field(0)) },
+      proof.proof,
+      roundKeys[i],
+    );
+  }
+
+  console.log("Generating proof for final AES round...");
+  proof = await RecursiveAes128.finalRound(
+    { round: Field(10), state: cipher },
+    proof.proof,
+    roundKeys[10],
+  );
+
+  console.log("Final AES proof generated!");
 
   console.log("Verifying proof locally...");
-  const isValid = await verify(proof, verificationKey);
-
+  const isValid = await verify(proof.proof, verificationKey);
   console.log(
     `Proof verification result: ${isValid ? "✅ Valid" : "❌ Invalid"}`,
   );

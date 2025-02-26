@@ -1,9 +1,9 @@
 import { Provable, Struct, ZkProgram } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
-import { shiftRows } from "./ShiftRows.js";
-import { sbox } from "./SBox.js";
-import { mixColumn } from "./MixColumns.js";
-import { addRoundKey } from "./AddRoundKey.js";
+import { Byte16 } from "../primitives/Bytes.js";
+import { shiftRows } from "../ShiftRows.js";
+import { sbox } from "../SBox.js";
+import { mixColumn } from "../MixColumns.js";
+import { addRoundKey } from "../AddRoundKey.js";
 
 const NUM_ROUNDS = 10;
 
@@ -38,7 +38,7 @@ function computeIterativeAes128Encryption(
 }
 
 const IterativeAes128 = ZkProgram({
-  name: "aes-verify",
+  name: "aes-verify-iterative",
   publicInput: IterativeAES128PublicInput,
 
   methods: {
