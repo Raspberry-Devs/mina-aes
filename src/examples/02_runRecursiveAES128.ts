@@ -75,7 +75,7 @@ async function main() {
   for (let i = 1; i < 10; i++) {
     console.log(`Generating proof for round ${i}...`);
     proof = await RecursiveAes128.mainRound(
-      { round: Field(i), state: new Byte16(Field(0), Field(0)) },
+      { round: Field(i), state: new Byte16(Field(0), Field(0)) }, // TODO: Should we compute partial encryptions here and add it?
       proof.proof,
       roundKeys[i],
     );
