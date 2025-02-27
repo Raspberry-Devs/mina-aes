@@ -1,5 +1,6 @@
-import { createForeignField, Field, Gadgets } from "o1js";
+import { createForeignField, Field, Gadgets, Provable } from "o1js";
 import { Field3 } from "o1js/dist/node/lib/provable/gadgets/foreign-field";
+import { inv_box } from "./RijndaelInverseBox";
 
 const RIJNDAEL_FINITE_SIZE = 256n;
 const BYTE_SIZE = 8;
@@ -65,8 +66,25 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
 
   // Method for finding the inverse
   inverse(): RijndaelFiniteField {
-    // ...implementation...
-    return new RijndaelFiniteField(0n);
+    const inv = Provable.witness(Field, () => {
+      const out = inv_box[Number(this.toFields()[0])];
+      return Field(out);
+    });
+
+    const r_inv = new RijndaelFiniteField([inv, Field(0n), Field(0n)]);
+
+    // If inv is 0, then the inverse is 0, otherwise it is 1
+    const isOne = inv.toFields()[0].equals(0).not();
+    const compare = new RijndaelFiniteField([
+      isOne.toField().mul(Field(1)),
+      Field(0n),
+      Field(0n),
+    ]);
+
+    // Add constraint that the inverse is correct
+    r_inv.mult(this).assertEquals(compare);
+
+    return r_inv;
   }
 
   static xor(

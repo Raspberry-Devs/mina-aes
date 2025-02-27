@@ -108,3 +108,24 @@ describe("RijndaelFiniteField Multiplication", () => {
     expect(Number(result3.toBigInt())).toEqual(153);
   });
 });
+
+describe("RijndaelFiniteField Inverse", () => {
+  it("should find the inverse correctly", () => {
+    const a = new RijndaelFiniteField(12n); // 12
+
+    const result = a.inverse();
+    expect(Number(result.toBigInt())).toEqual(0xb0);
+
+    const b = new RijndaelFiniteField(0b1010n); // 10
+    const result2 = b.inverse();
+    expect(Number(result2.toBigInt())).toEqual(0x29);
+
+    const c = new RijndaelFiniteField(0b1111000n); // 120
+    const result3 = c.inverse();
+    expect(Number(result3.toBigInt())).toEqual(182);
+
+    const d = new RijndaelFiniteField(0b0n); // 0
+    const result4 = d.inverse();
+    expect(Number(result4.toBigInt())).toEqual(0);
+  });
+});
