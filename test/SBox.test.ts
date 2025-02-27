@@ -1,6 +1,7 @@
 import { Field } from "o1js";
 import { Byte16 } from "../src/primitives/Bytes";
-import { sbox } from "../src/SBox";
+import { sbox, sbox_byte } from "../src/SBox";
+import { sbox_arr } from "../src/utils/SBoxArr";
 
 describe("SBox", () => {
   it("generates correct key for 2 bytes input", async () => {
@@ -10,7 +11,9 @@ describe("SBox", () => {
     ]);
 
     const num = sbox(input);
-    expect(num.toField()).toEqual(Field(0x63636363636363636363636363631d95n));
+    expect(num.toField().toBigInt()).toEqual(
+      0x63636363636363636363636363631d95n,
+    );
   });
 
   it("generates correct key for 4 bytes input", async () => {
@@ -19,7 +22,9 @@ describe("SBox", () => {
       0xde, 0xad, 0xbe, 0xef,
     ]);
     const num = sbox(input);
-    expect(num.toField()).toEqual(Field(0x6363636363636363636363631d95aedfn));
+    expect(num.toField().toBigInt()).toEqual(
+      0x6363636363636363636363631d95aedfn,
+    );
   });
 
   it("generates correct key for 16 bytes input", async () => {
@@ -28,6 +33,28 @@ describe("SBox", () => {
       0x0d, 0x0e, 0x0f, 0x10,
     ]);
     const num = sbox(input);
-    expect(num.toField()).toEqual(Field(0x7c777bf26b6fc53001672bfed7ab76can));
+    expect(num.toField().toBigInt()).toEqual(
+      0x7c777bf26b6fc53001672bfed7ab76can,
+    );
+  });
+});
+
+describe("SBox Single Byte", () => {
+  it("generates correct key for 1 byte input", () => {
+    const input = Field(0x00);
+    const num = sbox_byte(input);
+    expect(num.toBigInt()).toEqual(0x63n);
+
+    const input2 = Field(0x01);
+    const num2 = sbox_byte(input2);
+    expect(num2.toBigInt()).toEqual(0x7cn);
+  });
+
+  it("generates correct key with entire table", () => {
+    for (let i = 0; i < 256; i++) {
+      const input = Field(i);
+      const num = sbox_byte(input);
+      expect(num.toBigInt()).toEqual(sbox_arr[i].toBigInt());
+    }
   });
 });

@@ -1,35 +1,30 @@
-import { Field, Gadgets, Provable, Struct } from "o1js";
-import { Byte16 } from "./primitives/Bytes";
-import { sbox_arr } from "./utils/SBoxArr";
-
-class SBoxArr extends Struct({
-  value: Provable.Array(Field, 256),
-}) {}
+import { Field, Gadgets } from "o1js";
+import { Byte16 } from "./primitives/Bytes.js";
+import { BYTE_SIZE } from "./utils/constants.js";
+import {
+  affineTransform,
+  RijndaelFiniteField,
+} from "./utils/RijndaelFiniteField.js";
 
 function sbox(input: Field): Field {
   let output: Field = Field(0);
 
-  const sbox = new SBoxArr({ value: sbox_arr });
-
   for (let i = 0; i < 8; i++) {
     // Apply the S-box to each byte of the input
-    const shifted = Gadgets.rightShift64(input, i * 8);
-    const byte = Gadgets.and(shifted, Field(0xff), 64);
-    let byte_output = Field(0);
+    const shifted = Gadgets.rightShift64(input, i * BYTE_SIZE);
+    const byte = Gadgets.and(shifted, Field(0xff), BYTE_SIZE * BYTE_SIZE);
 
-    for (let j = 0; j < 256; j++) {
-      // This is either 0 or 1, depending on whether we have accessed the correct index
-      //TODO: Use map for more efficiency?
-      const correct_index = byte.equals(Field(j)).toField();
-
-      byte_output = byte_output.add(sbox.value[j].mul(correct_index));
-    }
-    // Transform byte_output to the correct position
-    byte_output = Gadgets.leftShift64(byte_output, i * 8);
-    output = output.add(byte_output);
+    const byte_sbox = sbox_byte(byte);
+    output = output.add(byte_sbox.mul(Field(2 ** (i * BYTE_SIZE))));
   }
 
   return output;
+}
+
+function sbox_byte(input: Field): Field {
+  const byte = RijndaelFiniteField.fromField(input);
+  const byte_sbox = affineTransform(byte);
+  return byte_sbox;
 }
 
 function sbox_public(input: Byte16): Byte16 {
@@ -39,4 +34,4 @@ function sbox_public(input: Byte16): Byte16 {
   return new Byte16(enc_top, enc_bot);
 }
 
-export { sbox_public as sbox };
+export { sbox_public as sbox, sbox_byte };

@@ -1,6 +1,6 @@
 import { Bool, Field, Gadgets, Provable } from "o1js";
-import { Byte16 } from "./primitives/Bytes";
-import { FieldList } from "./utils/list";
+import { Byte16 } from "./primitives/Bytes.js";
+import { FieldList } from "./utils/list.js";
 
 export function mixColumn(input: Byte16): Byte16 {
   let top = Field(0);
@@ -48,7 +48,6 @@ export function gmixColumn(r: FieldList): FieldList {
   const iterator = r.startIterating();
   for (let c = 0; c < 4; c++) {
     const value = iterator.next();
-    value.assertLessThanOrEqual(Field(0xff));
 
     a.push(value);
 
