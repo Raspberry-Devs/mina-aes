@@ -48,7 +48,6 @@ export function gmixColumn(r: FieldList): FieldList {
   const iterator = r.startIterating();
   for (let c = 0; c < 4; c++) {
     const value = iterator.next();
-    value.assertLessThanOrEqual(Field(0xff));
 
     a.push(value);
 
