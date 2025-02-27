@@ -41,15 +41,11 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
 
     // Shift left by one
     const shifted = Gadgets.leftShift32(a, 1);
-    const mask = Field(0b11011n).mul(highBitSet);
+    // Save an AND gate by adding the high bit to the mask
+    const mask = Field(0b100011011n).mul(highBitSet);
 
-    // If the high bit is set, then we need to XOR with the mask
-    // Additionally reduce result size to 8 bits
-    const result = Gadgets.and(
-      Gadgets.xor(shifted, mask, BYTE_SIZE),
-      Field(255n),
-      BYTE_SIZE,
-    );
+    // XOR with the mask, zeroes out high bit if it was set
+    const result = Gadgets.xor(shifted, mask, BYTE_SIZE + 1);
     return result;
   }
 
