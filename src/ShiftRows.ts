@@ -1,5 +1,5 @@
 import { Field, Gadgets } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
+import { Byte16 } from "./primitives/Bytes";
 /**
  * Modify the state to implement the shift operation.
  * Increasing cyclic shifts to the left down the rows.

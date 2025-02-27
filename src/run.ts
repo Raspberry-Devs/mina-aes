@@ -1,9 +1,9 @@
 import { Provable, Struct, ZkProgram } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
-import { addRoundKey } from "./AddRoundKey.js";
-import { shiftRows } from "./ShiftRows.js";
+import { Byte16 } from "./primitives/Bytes";
+import { addRoundKey } from "./AddRoundKey";
+import { shiftRows } from "./ShiftRows";
 import { sbox } from "./SBox.js";
-import { mixColumn } from "./MixColumns.js";
+import { mixColumn } from "./MixColumns";
 
 const NUM_ROUNDS = 10;
 

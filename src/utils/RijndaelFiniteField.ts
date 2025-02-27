@@ -1,6 +1,6 @@
 import { createForeignField, Field, Gadgets, Provable } from "o1js";
-import { inv_box } from "./RijndaelConstants.js";
-import { BYTE_SIZE, RIJNDAEL_FINITE_SIZE } from "./constants.js";
+import { inv_box } from "./RijndaelConstants";
+import { BYTE_SIZE, RIJNDAEL_FINITE_SIZE } from "./constants";
 
 class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
   static fromField(field: Field): RijndaelFiniteField {

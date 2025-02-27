@@ -1,6 +1,6 @@
 import { Bool, Field, Gadgets, Provable } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
-import { FieldList } from "./utils/list.js";
+import { Byte16 } from "./primitives/Bytes";
+import { FieldList } from "./utils/list";
 
 export function mixColumn(input: Byte16): Byte16 {
   let top = Field(0);
