@@ -1,11 +1,15 @@
 import { createForeignField, Field, Gadgets, Provable } from "o1js";
-import { Field3 } from "o1js/dist/node/lib/provable/gadgets/foreign-field";
-import { inv_box } from "./RijndaelInverseBox";
-
-const RIJNDAEL_FINITE_SIZE = 256n;
-const BYTE_SIZE = 8;
+import { inv_box } from "./RijndaelConstants.js";
+import { BYTE_SIZE, RIJNDAEL_FINITE_SIZE } from "./constants.js";
 
 class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
+  static fromField(field: Field): RijndaelFiniteField {
+    field.assertLessThanOrEqual(
+      RIJNDAEL_FINITE_SIZE - 1n,
+      "Field must be less than 256",
+    );
+    return new RijndaelFiniteField([field, Field(0n), Field(0n)]);
+  }
   // Override the multiplication method
   mult(other: RijndaelFiniteField): RijndaelFiniteField {
     // Convert the fields to Bits
@@ -28,7 +32,7 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
       cField = Gadgets.xor(cField, tempField, BYTE_SIZE);
     }
 
-    return new RijndaelFiniteField([cField, Field(0n), Field(0n)]);
+    return RijndaelFiniteField.fromField(cField);
   }
 
   static _multOne(a: Field): Field {
@@ -67,15 +71,11 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
       return Field(out);
     });
 
-    const r_inv = new RijndaelFiniteField([inv, Field(0n), Field(0n)]);
+    const r_inv = RijndaelFiniteField.fromField(inv);
 
     // If inv is 0, then the inverse is 0, otherwise it is 1
     const isOne = inv.toFields()[0].equals(0).not();
-    const compare = new RijndaelFiniteField([
-      isOne.toField(),
-      Field(0n),
-      Field(0n),
-    ]);
+    const compare = RijndaelFiniteField.fromField(isOne.toField());
 
     // Add constraint that the inverse is correct
     r_inv.mult(this).assertEquals(compare);
@@ -95,11 +95,34 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
     // Perform XOR operation on field
     const out = Gadgets.xor(aField[0], bField[0], BYTE_SIZE);
 
-    // Convert into Field3
-    const cField: Field3 = [out, Field(0), Field(0)];
-
-    return new RijndaelFiniteField(cField);
+    return RijndaelFiniteField.fromField(out);
   }
 }
 
-export { RijndaelFiniteField };
+function affineTransform(a: RijndaelFiniteField) {
+  const a_inv_bits = a
+    .inverse()
+    .toFields()[0]
+    .toBits()
+    .map((bit) => bit.toField());
+
+  const c = Field(0x63)
+    .toBits()
+    .map((bit) => bit.toField());
+  let res = Field(0);
+
+  for (let i = 0; i < BYTE_SIZE; i++) {
+    let bit = a_inv_bits[i];
+    bit = Gadgets.xor(bit, a_inv_bits[(i + 4) % BYTE_SIZE], 1);
+    bit = Gadgets.xor(bit, a_inv_bits[(i + 5) % BYTE_SIZE], 1);
+    bit = Gadgets.xor(bit, a_inv_bits[(i + 6) % BYTE_SIZE], 1);
+    bit = Gadgets.xor(bit, a_inv_bits[(i + 7) % BYTE_SIZE], 1);
+    bit = Gadgets.xor(bit, c[i], 1);
+
+    res = Gadgets.or(res, Gadgets.leftShift32(bit, i), BYTE_SIZE);
+  }
+
+  return res;
+}
+
+export { RijndaelFiniteField, affineTransform };

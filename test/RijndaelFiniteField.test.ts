@@ -1,3 +1,4 @@
+import { Field } from "o1js";
 import { RijndaelFiniteField } from "../src/utils/RijndaelFiniteField";
 
 describe("RijndaelFiniteField Addition", () => {
@@ -127,5 +128,13 @@ describe("RijndaelFiniteField Inverse", () => {
     const d = new RijndaelFiniteField(0b0n); // 0
     const result4 = d.inverse();
     expect(Number(result4.toBigInt())).toEqual(0);
+  });
+});
+
+describe("RijndaelFiniteField constructor", () => {
+  it("error when too large a number is passed", () => {
+    expect(() => RijndaelFiniteField.fromField(Field(0x200n))).toThrow(
+      "Field must be less than 256",
+    );
   });
 });
