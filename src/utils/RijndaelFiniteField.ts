@@ -1,13 +1,9 @@
 import { createForeignField, Field, Gadgets, Provable } from "o1js";
-import { inv_box } from "./RijndaelConstants";
-import { BYTE_SIZE, RIJNDAEL_FINITE_SIZE } from "./constants";
+import { inv_box } from "./RijndaelConstants.js";
+import { BYTE_SIZE, RIJNDAEL_FINITE_SIZE } from "./constants.js";
 
 class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
   static fromField(field: Field): RijndaelFiniteField {
-    field.assertLessThanOrEqual(
-      RIJNDAEL_FINITE_SIZE - 1n,
-      "Field must be less than 256",
-    );
     return new RijndaelFiniteField([field, Field(0n), Field(0n)]);
   }
   // Override the multiplication method

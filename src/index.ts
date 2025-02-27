@@ -1,14 +1,23 @@
-import { Byte16 } from "./primitives/Bytes";
-import {
-  AESPublicInput,
-  aesZKProgram,
-  encrypt,
-  encryptStageOne,
-} from "./run.js";
+import { Byte16 } from "./primitives/Bytes.js";
+import { AESPublicInput, aesZKProgram, encrypt } from "./run.js";
 
-const { verifyAES128Partial } = await aesZKProgram.analyzeMethods();
+const { verifyAES128, sbox, mixColumns, shiftRows, addRoundKey } =
+  await aesZKProgram.analyzeMethods();
 
-console.log(verifyAES128Partial.summary());
+console.log("Circuit Summary:");
+console.log(verifyAES128.summary());
+
+console.log("SBox Summary:");
+console.log(sbox.summary());
+
+console.log("MixColumns Summary:");
+console.log(mixColumns.summary());
+
+console.log("ShiftRows Summary:");
+console.log(shiftRows.summary());
+
+console.log("AddRoundKey Summary:");
+console.log(addRoundKey.summary());
 
 console.time("compile");
 const forceRecompileEnabled = false;
@@ -81,14 +90,10 @@ console.info("Pre-verified Cipher: ", cipher);
 
 console.timeEnd("generate inputs");
 
-console.time("out of circuit proof");
-const partial_output = encryptStageOne(message, key);
-console.timeEnd("out of circuit proof");
-
 console.time("prove");
-const { proof } = await aesZKProgram.verifyAES128Partial(
+const { proof } = await aesZKProgram.verifyAES128(
   new AESPublicInput({ cipher }),
-  partial_output,
+  message,
   key,
 );
 console.timeEnd("prove");

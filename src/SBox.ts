@@ -1,10 +1,10 @@
 import { Field, Gadgets } from "o1js";
-import { Byte16 } from "./primitives/Bytes";
-import { BYTE_SIZE } from "./utils/constants";
+import { Byte16 } from "./primitives/Bytes.js";
+import { BYTE_SIZE } from "./utils/constants.js";
 import {
   affineTransform,
   RijndaelFiniteField,
-} from "./utils/RijndaelFiniteField";
+} from "./utils/RijndaelFiniteField.js";
 
 function sbox(input: Field): Field {
   let output: Field = Field(0);

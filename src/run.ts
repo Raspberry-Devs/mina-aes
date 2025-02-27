@@ -1,9 +1,9 @@
 import { Provable, Struct, ZkProgram } from "o1js";
-import { Byte16 } from "./primitives/Bytes";
-import { addRoundKey } from "./AddRoundKey";
-import { shiftRows } from "./ShiftRows";
+import { Byte16 } from "./primitives/Bytes.js";
+import { addRoundKey } from "./AddRoundKey.js";
+import { shiftRows } from "./ShiftRows.js";
 import { sbox } from "./SBox.js";
-import { mixColumn } from "./MixColumns";
+import { mixColumn } from "./MixColumns.js";
 
 const NUM_ROUNDS = 10;
 
@@ -66,7 +66,7 @@ const aesZKProgram = ZkProgram({
   publicInput: AESPublicInput,
 
   methods: {
-    verifyAES128Partial: {
+    verifyAES128: {
       privateInputs: [Byte16, Provable.Array(Byte16, NUM_ROUNDS + 1)],
 
       async method(
@@ -77,6 +77,38 @@ const aesZKProgram = ZkProgram({
         const state = encrypt(message, roundKeys);
 
         return state.assertEquals(input.cipher);
+      },
+    },
+
+    sbox: {
+      privateInputs: [Byte16],
+
+      async method(input: AESPublicInput, output: Byte16) {
+        return sbox(input.cipher).assertEquals(output);
+      },
+    },
+
+    mixColumns: {
+      privateInputs: [Byte16],
+
+      async method(input: AESPublicInput, output: Byte16) {
+        return mixColumn(input.cipher).assertEquals(output);
+      },
+    },
+
+    shiftRows: {
+      privateInputs: [Byte16],
+
+      async method(input: AESPublicInput, output: Byte16) {
+        return shiftRows(input.cipher).assertEquals(output);
+      },
+    },
+
+    addRoundKey: {
+      privateInputs: [Byte16],
+
+      async method(input: AESPublicInput, output: Byte16) {
+        return addRoundKey(input.cipher, input.cipher).assertEquals(output);
       },
     },
   },
