@@ -10,27 +10,28 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
   mult(other: RijndaelFiniteField): RijndaelFiniteField {
     // Convert the fields to Bits
     const aField = this.toFields()[0];
-    const bField = other.toFields()[0];
+    let bField = other.toFields()[0];
 
     let cField = Field(0n);
 
-    // Naive implementation of multiplication which is O(n^2)
+    let tempA = aField;
     for (let i = 0; i < BYTE_SIZE; i++) {
-      const isOne = Gadgets.and(
-        Gadgets.rightShift64(bField, i),
-        Field(1),
-        1,
-      ).assertBool("bShifted is not a boolean");
-      let tempField = aField.mul(isOne.toField());
-      for (let j = 0; j < i; j++) {
-        tempField = RijndaelFiniteField._multOne(tempField);
-      }
-      cField = Gadgets.xor(cField, tempField, BYTE_SIZE);
+      // Check the least-significant bit of bField.
+      const lsb = Gadgets.and(bField, Field(1), 1);
+      // If the bit is 1, add the current tempA (multiplicand shifted by i)
+      // to the result using XOR (addition in GF(2^8)).
+      cField = Gadgets.xor(cField, tempA.mul(lsb), BYTE_SIZE);
+
+      // Multiply tempA by x (i.e. perform RijndaelFiniteField._multOne) for next bit.
+      tempA = RijndaelFiniteField._multOne(tempA);
+      // Right shift bField by 1 to process the next bit.
+      bField = Gadgets.rightShift64(bField, 1);
     }
 
     return RijndaelFiniteField.fromField(cField);
   }
 
+  // Helper method for multiplying by x
   static _multOne(a: Field): Field {
     // Check whether the high bit is set
     const highBitSet = Gadgets.and(
@@ -40,7 +41,7 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
     );
 
     // Shift left by one
-    const shifted = Gadgets.leftShift32(a, 1);
+    const shifted = a.mul(2);
     // Save an AND gate by adding the high bit to the mask
     const mask = Field(0b100011011n).mul(highBitSet);
 
@@ -109,13 +110,15 @@ function affineTransform(a: RijndaelFiniteField) {
 
   for (let i = 0; i < BYTE_SIZE; i++) {
     let bit = a_inv_bits[i];
-    bit = Gadgets.xor(bit, a_inv_bits[(i + 4) % BYTE_SIZE], 1);
-    bit = Gadgets.xor(bit, a_inv_bits[(i + 5) % BYTE_SIZE], 1);
-    bit = Gadgets.xor(bit, a_inv_bits[(i + 6) % BYTE_SIZE], 1);
-    bit = Gadgets.xor(bit, a_inv_bits[(i + 7) % BYTE_SIZE], 1);
-    bit = Gadgets.xor(bit, c[i], 1);
+    bit = bit.add(a_inv_bits[(i + 4) % BYTE_SIZE]);
+    bit = bit.add(a_inv_bits[(i + 5) % BYTE_SIZE]);
+    bit = bit.add(a_inv_bits[(i + 6) % BYTE_SIZE]);
+    bit = bit.add(a_inv_bits[(i + 7) % BYTE_SIZE]);
+    bit = bit.add(c[i]);
 
-    res = Gadgets.or(res, Gadgets.leftShift32(bit, i), BYTE_SIZE);
+    bit = Gadgets.and(bit, Field(1), 1);
+
+    res = res.add(bit.mul(2 ** i));
   }
 
   return res;

@@ -15,11 +15,7 @@ function sbox(input: Field): Field {
     const byte = Gadgets.and(shifted, Field(0xff), BYTE_SIZE * BYTE_SIZE);
 
     const byte_sbox = sbox_byte(byte);
-    output = Gadgets.or(
-      Gadgets.leftShift64(byte_sbox, i * BYTE_SIZE),
-      output,
-      BYTE_SIZE * BYTE_SIZE,
-    );
+    output = output.add(byte_sbox.mul(Field(2 ** (i * BYTE_SIZE))));
   }
 
   return output;
