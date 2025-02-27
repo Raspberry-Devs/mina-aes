@@ -72,7 +72,7 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
     // If inv is 0, then the inverse is 0, otherwise it is 1
     const isOne = inv.toFields()[0].equals(0).not();
     const compare = new RijndaelFiniteField([
-      isOne.toField().mul(Field(1)),
+      isOne.toField(),
       Field(0n),
       Field(0n),
     ]);
