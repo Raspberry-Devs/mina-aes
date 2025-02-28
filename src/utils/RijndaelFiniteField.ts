@@ -43,7 +43,7 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
     // Shift left by one
     const shifted = a.mul(2);
     // Save an AND gate by adding the high bit to the mask
-    const mask = Field(0b100011011n).mul(highBitSet);
+    const mask = Field(0b100011011).mul(highBitSet);
 
     // XOR with the mask, zeroes out high bit if it was set
     const result = Gadgets.xor(shifted, mask, BYTE_SIZE + 1);
@@ -72,10 +72,9 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
 
     // If inv is 0, then the inverse is 0, otherwise it is 1
     const isOne = inv.toFields()[0].equals(0).not();
-    const compare = RijndaelFiniteField.fromField(isOne.toField());
 
     // Add constraint that the inverse is correct
-    r_inv.mult(this).assertEquals(compare);
+    r_inv.mult(this).toFields()[0].assertEquals(isOne.toField());
 
     return r_inv;
   }
@@ -96,16 +95,16 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
   }
 }
 
-function affineTransform(a: RijndaelFiniteField) {
-  const a_inv_bits = a
-    .inverse()
-    .toFields()[0]
-    .toBits()
-    .map((bit) => bit.toField());
+function byteToBits(a: Field): Field[] {
+  return Array.from({ length: BYTE_SIZE }, (_, i) => {
+    return Gadgets.and(Gadgets.rightShift64(a, i), Field(1), 1);
+  });
+}
 
-  const c = Field(0x63)
-    .toBits()
-    .map((bit) => bit.toField());
+function affineTransform(a: RijndaelFiniteField) {
+  const a_inv_bits = byteToBits(a.inverse().toFields()[0]);
+
+  const c = byteToBits(Field(0x63));
   let res = Field(0);
 
   for (let i = 0; i < BYTE_SIZE; i++) {

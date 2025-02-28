@@ -1,7 +1,7 @@
 import { Byte16 } from "./primitives/Bytes.js";
 import { AESPublicInput, aesZKProgram, encrypt } from "./run.js";
 
-const { verifyAES128, sbox, mixColumns, shiftRows, addRoundKey } =
+const { verifyAES128, sboxByte, sbox, mixColumns, shiftRows, addRoundKey } =
   await aesZKProgram.analyzeMethods();
 
 console.log("Circuit Summary:");
@@ -9,6 +9,9 @@ console.log(verifyAES128.summary());
 
 console.log("SBox Summary:");
 console.log(sbox.summary());
+
+console.log("SBoxByte Summary:");
+console.log(sboxByte.summary());
 
 console.log("MixColumns Summary:");
 console.log(mixColumns.summary());

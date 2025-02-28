@@ -1,8 +1,8 @@
-import { Provable, Struct, ZkProgram } from "o1js";
+import { Field, Provable, Struct, ZkProgram } from "o1js";
 import { Byte16 } from "./primitives/Bytes.js";
 import { addRoundKey } from "./AddRoundKey.js";
 import { shiftRows } from "./ShiftRows.js";
-import { sbox } from "./SBox.js";
+import { sbox, sbox_byte } from "./SBox.js";
 import { mixColumn } from "./MixColumns.js";
 
 const NUM_ROUNDS = 10;
@@ -109,6 +109,14 @@ const aesZKProgram = ZkProgram({
 
       async method(input: AESPublicInput, output: Byte16) {
         return addRoundKey(input.cipher, input.cipher).assertEquals(output);
+      },
+    },
+
+    sboxByte: {
+      privateInputs: [Field, Field],
+
+      async method(input_ignore: AESPublicInput, input: Field, output: Field) {
+        return sbox_byte(input).assertEquals(output);
       },
     },
   },
