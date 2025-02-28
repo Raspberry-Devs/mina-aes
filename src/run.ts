@@ -18,7 +18,7 @@ function encrypt(message: Byte16, key: Byte16[]): Byte16 {
     state = mixColumn(state);
     state = addRoundKey(state, key[i]);
   }
-  //state = sbox(state);
+  state = sbox(state);
   state = shiftRows(state);
   state = addRoundKey(state, key[NUM_ROUNDS]);
 
