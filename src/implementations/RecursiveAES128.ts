@@ -12,6 +12,7 @@ class RecursiveAES128PublicInput extends Struct({
   state: Byte16,
 }) {}
 
+// TODO: ADD KEY EXPANSIONs
 const RecursiveAes128 = ZkProgram({
   name: "aes-verify-recursive",
   publicInput: RecursiveAES128PublicInput,
