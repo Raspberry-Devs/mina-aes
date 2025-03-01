@@ -102,19 +102,40 @@ export class Byte16 extends Struct({
   }
 
   static fromColumns(cols: Field[][]): Byte16 {
-    // Build top first
     let top = Field(0);
-    let bot = Field(0);
-    for (let i = 0; i < 2; i++) {
-      for (let j = 0; j < 4; j++) {
-        top = Gadgets.or(Gadgets.leftShift64(top, 8), cols[i][j], 64);
-      }
+    // Reassemble the "top" 64 bits in order:
+    // Order: cols[0][0], cols[1][0], cols[2][0], cols[3][0],
+    //        cols[0][1], cols[1][1], cols[2][1], cols[3][1]
+    const topBytesOrder = [
+      cols[0][0],
+      cols[1][0],
+      cols[2][0],
+      cols[3][0],
+      cols[0][1],
+      cols[1][1],
+      cols[2][1],
+      cols[3][1],
+    ];
+    for (let i = 0; i < topBytesOrder.length; i++) {
+      top = Gadgets.or(Gadgets.leftShift64(top, 8), topBytesOrder[i], 64);
     }
 
-    for (let i = 2; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        bot = Gadgets.or(Gadgets.leftShift64(bot, 8), cols[i][j], 64);
-      }
+    let bot = Field(0);
+    // Reassemble the "bot" 64 bits in order:
+    // Order: cols[0][2], cols[1][2], cols[2][2], cols[3][2],
+    //        cols[0][3], cols[1][3], cols[2][3], cols[3][3]
+    const botBytesOrder = [
+      cols[0][2],
+      cols[1][2],
+      cols[2][2],
+      cols[3][2],
+      cols[0][3],
+      cols[1][3],
+      cols[2][3],
+      cols[3][3],
+    ];
+    for (let i = 0; i < botBytesOrder.length; i++) {
+      bot = Gadgets.or(Gadgets.leftShift64(bot, 8), botBytesOrder[i], 64);
     }
 
     return new Byte16(top, bot);

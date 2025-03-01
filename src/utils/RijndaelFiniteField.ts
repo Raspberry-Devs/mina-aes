@@ -2,11 +2,26 @@ import { createForeignField, Field, Gadgets, Provable } from "o1js";
 import { inv_box } from "./RijndaelConstants.js";
 import { BYTE_SIZE, RIJNDAEL_FINITE_SIZE } from "./constants.js";
 
+/**
+ * A Finite Field which implements {@link https://en.wikipedia.org/wiki/Finite_field_arithmetic#Rijndael's_(AES)_finite_field Rijndael's Finite Field} operations.
+ * Operates on values less than 256 and is used to generate sbox values on the fly
+ * Its most important for providing non-linearity within the AES encryption scheme
+ */
 class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
+  /**
+   * Wrap field into RijndaelFiniteField, note that field should be less than 256
+   * @param {Field} field Input field to wrap
+   * @returns {RijndaelFiniteField}
+   */
   static fromField(field: Field): RijndaelFiniteField {
     return new RijndaelFiniteField([field, Field(0n), Field(0n)]);
   }
-  // Override the multiplication method
+
+  /**
+   * Multiply two Rijndael numbers
+   * @param {RijndaelFiniteField} other the second number to multiply with
+   * @returns {RijndaelFiniteField} result from multiplication
+   */
   mult(other: RijndaelFiniteField): RijndaelFiniteField {
     // Convert the fields to Bits
     const aField = this.toFields()[0];
@@ -31,7 +46,11 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
     return RijndaelFiniteField.fromField(cField);
   }
 
-  // Helper method for multiplying by x
+  /**
+   * Multiply a Rijndael number by x (represented as 2 in the field)
+   * @param {Field} a
+   * @returns {Field}
+   */
   static _multOne(a: Field): Field {
     // Check whether the high bit is set
     const highBitSet = Gadgets.and(
@@ -43,25 +62,36 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
     // Shift left by one
     const shifted = a.mul(2);
     // Save an AND gate by adding the high bit to the mask
-    const mask = Field(0b100011011n).mul(highBitSet);
+    const mask = Field(0b100011011).mul(highBitSet);
 
     // XOR with the mask, zeroes out high bit if it was set
     const result = Gadgets.xor(shifted, mask, BYTE_SIZE + 1);
     return result;
   }
 
-  // Override the addition method
+  /**
+   * Add two Rijndael numbers together, this is equivalent to an xor operation
+   * @param {RijndaelFiniteField} other
+   * @returns {RijndaelFiniteField}
+   */
   add(other: RijndaelFiniteField): RijndaelFiniteField {
     // Addition in Rijndael's field is equivalent to bitwise XOR
     return RijndaelFiniteField.xor(this, other);
   }
 
-  // Override the division method (finding the inverse and multiplying)
+  /**
+   * Divides the current number by another. This is equivalent to multiplying by an inverse
+   * @param {RijndaelFiniteField} other the numerator in the division
+   * @returns {RijndaelFiniteField}
+   */
   div(other: RijndaelFiniteField): RijndaelFiniteField {
     return this.mult(other.inverse());
   }
 
-  // Method for finding the inverse
+  /**
+   * Computes the inverse of the current value, the inverse always satisifes the relationship p * (p^-1) = 1
+   * @returns {RijndaelFiniteField}
+   */
   inverse(): RijndaelFiniteField {
     const inv = Provable.witness(Field, () => {
       const out = inv_box[Number(this.toFields()[0])];
@@ -72,14 +102,19 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
 
     // If inv is 0, then the inverse is 0, otherwise it is 1
     const isOne = inv.toFields()[0].equals(0).not();
-    const compare = RijndaelFiniteField.fromField(isOne.toField());
 
     // Add constraint that the inverse is correct
-    r_inv.mult(this).assertEquals(compare);
+    r_inv.mult(this).toFields()[0].assertEquals(isOne.toField());
 
     return r_inv;
   }
 
+  /**
+   * Performs bitwise xor used in Rijndael addition
+   * @param a first input
+   * @param b second input
+   * @returns {RijndaelFiniteField} resulting xor result
+   */
   static xor(
     a: RijndaelFiniteField,
     b: RijndaelFiniteField,
@@ -96,16 +131,27 @@ class RijndaelFiniteField extends createForeignField(RIJNDAEL_FINITE_SIZE) {
   }
 }
 
-function affineTransform(a: RijndaelFiniteField) {
-  const a_inv_bits = a
-    .inverse()
-    .toFields()[0]
-    .toBits()
-    .map((bit) => bit.toField());
+/**
+ * Custom method to convert a field into an array of bits (length of 8)
+ * This uses less constraints than Field.toBits() as we can assume that the input is 8 bits long
+ * @param a Field to convert into bits, must always fit into 8 bits, otherwise data will be truncated
+ * @returns {Field[]} Array of Fields which are either 1 or 0
+ */
+function byteToBits(a: Field): Field[] {
+  return Array.from({ length: BYTE_SIZE }, (_, i) => {
+    return Gadgets.and(Gadgets.rightShift64(a, i), Field(1), 1);
+  });
+}
 
-  const c = Field(0x63)
-    .toBits()
-    .map((bit) => bit.toField());
+/**
+ * Performs full sbox substitution by performing an inverse followed by a matrix multiplication
+ * @param a value to transform
+ * @returns Field value after transformation
+ */
+function affineTransform(a: RijndaelFiniteField): Field {
+  const a_inv_bits = byteToBits(a.inverse().toFields()[0]);
+
+  const c = byteToBits(Field(0x63));
   let res = Field(0);
 
   for (let i = 0; i < BYTE_SIZE; i++) {
