@@ -1,31 +1,9 @@
-import { Field, Gadgets } from "o1js";
+import { Field } from "o1js";
 import { Byte16 } from "./primitives/Bytes.js";
-import { BYTE_SIZE } from "./utils/constants.js";
 import {
   affineTransform,
   RijndaelFiniteField,
 } from "./utils/RijndaelFiniteField.js";
-
-/**
- * Takes in a 8-byte number represented as a field and returns the substituted output
- * Note that this code will return incorrect values for numbers larger than 8-bytes
- * @param {Field} input an 8-byte number represented within a field
- * @returns {Field} the substituted output
- */
-function sbox(input: Field): Field {
-  let output: Field = Field(0);
-
-  for (let i = 0; i < 8; i++) {
-    // Apply the S-box to each byte of the input
-    const shifted = Gadgets.rightShift64(input, i * BYTE_SIZE);
-    const byte = Gadgets.and(shifted, Field(0xff), BYTE_SIZE * BYTE_SIZE);
-
-    const byte_sbox = sbox_byte(byte);
-    output = output.add(byte_sbox.mul(Field(2 ** (i * BYTE_SIZE))));
-  }
-
-  return output;
-}
 
 /**
  * Takes in a byte represented as a field and returns the substituted output
@@ -44,11 +22,19 @@ function sbox_byte(input: Field): Field {
  * @param {Byte16} input the 128-bit value to substitute
  * @returns {Byte16} the substituted value
  */
-function sbox_public(input: Byte16): Byte16 {
-  const enc_top = sbox(input.top);
-  const enc_bot = sbox(input.bot);
+function sbox(input: Byte16): Byte16 {
+  const cols = input.toColumns();
+  const newCols: Field[][] = [];
 
-  return new Byte16(enc_top, enc_bot);
+  for (let i = 0; i < 4; i++) {
+    const arr: Field[] = [];
+    for (let j = 0; j < 4; j++) {
+      arr.push(sbox_byte(cols[i][j]));
+    }
+    newCols.push(arr);
+  }
+
+  return Byte16.fromColumns(newCols);
 }
 
-export { sbox_public as sbox, sbox_byte };
+export { sbox, sbox_byte };
