@@ -1,7 +1,9 @@
 import { Field, Struct, Gadgets } from "o1js";
 
 /**
- * A struct that represents 16 bytes packed into a single Field element.
+ * Represents a 64-bit field element for AES encryption
+ * @param top The upper 32-bits of the 64-bit field element
+ * @param bot The lower 32-bits of the 64-bit field element
  */
 export class Byte16 extends Struct({
   top: Field,
@@ -17,6 +19,10 @@ export class Byte16 extends Struct({
     bot.assertLessThan(Byte16.TWO64);
   }
 
+  /**
+   * Performs equality check on two Byte16 values
+   * @param other
+   */
   assertEquals(other: Byte16) {
     this.top.assertEquals(other.top);
     this.bot.assertEquals(other.bot);
@@ -24,6 +30,7 @@ export class Byte16 extends Struct({
 
   /**
    * Converts an array of 16 bytes into a Byte16 instance.
+   * NONPROVABLE: This function should only be used for testing purposes.
    * @param bytes An array of 16 numbers, each between 0 and 255.
    * @returns A Byte16 instance.
    */
@@ -51,7 +58,8 @@ export class Byte16 extends Struct({
   }
 
   /**
-   * Converts the Byte16 instance back into an array of 16 bytes.
+   * Converts the Byte16 instance back into an array of 16 bytes. Note this should be used for testing purposes only.
+   * NONPROVABLE: This function should only be used for testing purposes.
    * @returns An array of 16 numbers, each between 0 and 255.
    */
   toBytes(): number[] {
@@ -70,6 +78,10 @@ export class Byte16 extends Struct({
     return bytes;
   }
 
+  /**
+   * Converts a Byte16 instance into a 4x4 matrix of Field elements - each one byte
+   * @returns A 4x4 matrix of Field elements.
+   */
   toColumns(): Field[][] {
     // Get first column
     const arr: Field[][] = [];
@@ -101,6 +113,11 @@ export class Byte16 extends Struct({
     return arr;
   }
 
+  /**
+   * Converts matrix representation into Byte16 instance.
+   * @param cols 4x4 matrix of byte sized Field elements
+   * @returns Byte16 instance
+   */
   static fromColumns(cols: Field[][]): Byte16 {
     let top = Field(0);
     // Reassemble the "top" 64 bits in order:
@@ -141,6 +158,10 @@ export class Byte16 extends Struct({
     return new Byte16(top, bot);
   }
 
+  /**
+   *
+   * @returns Field representation of the Byte16 instance
+   */
   toField(): Field {
     return this.bot.add(this.top.mul(Byte16.TWO64));
   }

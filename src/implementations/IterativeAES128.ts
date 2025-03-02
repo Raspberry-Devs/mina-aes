@@ -12,7 +12,7 @@ class IterativeAES128PublicInput extends Struct({
 }) {}
 
 // !!!!! Key expansion done off chain !!!!!
-function computeIterativeAes128Encryption(
+export function computeIterativeAes128Encryption(
   message: Byte16,
   key: Byte16[],
 ): Byte16 {
