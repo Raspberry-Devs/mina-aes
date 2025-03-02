@@ -9,8 +9,6 @@ describe("ShiftRows", () => {
       0x1e, 0x41, 0x52, 0x30,
     ]);
     const num = shiftRows(input);
-    expect(num.toField().toBigInt().toString(16)).toEqual(
-      "d4bf5d30e0b452aeb84111f11e2798e5",
-    ); // quick hack for output in hex
+    expect(num.toHex()).toEqual("d4bf5d30e0b452aeb84111f11e2798e5"); // quick hack for output in hex
   });
 });
