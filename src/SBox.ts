@@ -45,8 +45,8 @@ function sbox_byte(input: Field): Field {
  * @returns {Byte16} the substituted value
  */
 function sbox_public(input: Byte16): Byte16 {
-  const enc_top = sbox(input.top);
-  const enc_bot = sbox(input.bot);
+  const enc_top = sbox(input.left);
+  const enc_bot = sbox(input.right);
 
   return new Byte16(enc_top, enc_bot);
 }

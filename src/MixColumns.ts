@@ -1,26 +1,20 @@
-import { Bool, Field, Gadgets, Provable } from "o1js";
+import { Field, Gadgets } from "o1js";
 import { Byte16 } from "./primitives/Bytes.js";
 
+/**
+ * Performs the AES MixColumn operation on a 128-bit value.
+ * Performs a matrix multiplication on the input value, providing diffusion.
+ * @param input Take in a 128-bit value represented as a Byte16 class
+ * @returns Transformed 128-bit value represented as a Byte16 class
+ */
 export function mixColumn(input: Byte16): Byte16 {
-  let top = Field(0);
-  let bot = Field(0);
+  const cols = input.toColumns();
+  const newCols: Field[][] = [];
 
   for (let j = 0; j < 4; ++j) {
-    const col: Field[] = [];
-    for (let i = 3; i >= 0; --i) {
-      const inp = Provable.if(new Bool(i < 2), input.bot, input.top);
-      const shift = 24 + (i % 2) * 32 - j * 8;
-      const mask = Gadgets.leftShift64(Field(0xff), shift);
-      col.push(Gadgets.rightShift64(Gadgets.and(mask, inp, 64), shift));
-    }
-    const mixCol: Field[] = gmixColumn(col);
-    // just do the loop for the output manually by popping off of mixCol
-    bot = bot.add(Gadgets.leftShift64(mixCol[3], 24 - 8 * j));
-    bot = bot.add(Gadgets.leftShift64(mixCol[2], 32 + 24 - 8 * j));
-    top = top.add(Gadgets.leftShift64(mixCol[1], 24 - 8 * j));
-    top = top.add(Gadgets.leftShift64(mixCol[0], 32 + 24 - 8 * j));
+    newCols.push(gmixColumn(cols[j]));
   }
-  return new Byte16(top, bot);
+  return Byte16.fromColumns(newCols);
 }
 
 function xor8(a: Field, b: Field): Field {
@@ -31,6 +25,11 @@ function xor8_5(a: Field, b: Field, c: Field, d: Field, e: Field): Field {
   return xor8(xor8(xor8(xor8(a, b), c), d), e);
 }
 
+/**
+ *
+ * @param r A column of 4 bytes. Represented as an array of Field elements.
+ * @returns Modified column of 4 bytes. Represented as an array of Field elements.
+ */
 export function gmixColumn(r: Field[]): Field[] {
   const a: Field[] = [];
   const b: Field[] = [];

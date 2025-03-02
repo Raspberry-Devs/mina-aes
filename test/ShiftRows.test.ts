@@ -2,14 +2,15 @@ import { Byte16 } from "../src/primitives/Bytes";
 import { shiftRows } from "../src/ShiftRows";
 
 describe("ShiftRows", () => {
+  // Taken from FIPS 197, Appendix A.1
   it("test expected outcome of shiftRows", async () => {
     const input = Byte16.fromBytes([
-      0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
-      0x0d, 0x0e, 0x0f, 0x10,
+      0xd4, 0x27, 0x11, 0xae, 0xe0, 0xbf, 0x98, 0xf1, 0xb8, 0xb4, 0x5d, 0xe5,
+      0x1e, 0x41, 0x52, 0x30,
     ]);
     const num = shiftRows(input);
     expect(num.toField().toBigInt().toString(16)).toEqual(
-      "1020304060708050b0c090a100d0e0f",
+      "d4bf5d30e0b452aeb84111f11e2798e5",
     ); // quick hack for output in hex
   });
 });

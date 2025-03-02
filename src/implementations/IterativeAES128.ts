@@ -20,6 +20,7 @@ export function computeIterativeAes128Encryption(
 
   // Initial round key addition
   state = addRoundKey(state, key[0]);
+  console.log("Initial round key addition: ", state.toHex());
 
   // Main rounds: SBox, ShiftRows, MixColumns, AddRoundKey
   for (let i = 1; i < NUM_ROUNDS; i++) {
@@ -27,6 +28,7 @@ export function computeIterativeAes128Encryption(
     state = shiftRows(state);
     state = mixColumn(state);
     state = addRoundKey(state, key[i]);
+    console.log(`Round ${i}: `, state.toHex());
   }
 
   // Final round (without MixColumns)
