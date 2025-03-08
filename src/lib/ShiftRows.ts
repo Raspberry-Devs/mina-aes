@@ -1,4 +1,4 @@
-import { Byte16 } from "./primitives/Bytes.js";
+import { Byte16 } from "../primitives/Bytes.js";
 
 /**
  * Modify the state to implement the shift operation.

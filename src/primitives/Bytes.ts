@@ -4,6 +4,7 @@ import { Field, Struct, Gadgets, Provable } from "o1js";
  * Represents a 128-bit field element for AES encryption
  */
 export class Byte16 extends Struct({
+  // TODO: Its not clear which of the nested arrays are columns and which are rows
   value: Provable.Array(Provable.Array(Field, 4), 4),
 }) {
   constructor(value: Field[][]) {
@@ -129,6 +130,38 @@ export class Byte16 extends Struct({
       }
     }
     return out;
+  }
+
+  /**
+   * Converts a Field value into a Byte16 instance.
+   * @param field field must fit into 128 bits, otherwise behaviour is undefined
+   * @returns A Byte16 instance representing the field value.
+   */
+  static fromField(field: Field): Byte16 {
+    // Create Byte16 as witness and verify equality with the field.
+    const byte16 = Provable.witness(Byte16, () => {
+      return Byte16.fromBigInt(field.toBigInt());
+    });
+
+    // Check that the field is equal to the Byte16 value.
+    byte16.toField().assertEquals(field);
+    return byte16;
+  }
+
+  /**
+   * Converts a BigInt value into a Byte16 instance.
+   * NONPROVABLE: Can be used as witness
+   * @param value the big integer to convert, must be 128 bits
+   * @returns new Byte16 class
+   */
+  static fromBigInt(value: bigint): Byte16 {
+    const bytes = [];
+    const SIZE = 16;
+    for (let i = 0; i < SIZE; i++) {
+      const byte = (value >> BigInt(i * 8)) & 0xffn;
+      bytes[SIZE - i - 1] = Number(byte);
+    }
+    return Byte16.fromBytes(bytes);
   }
 
   /**

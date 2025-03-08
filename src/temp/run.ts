@@ -1,11 +1,10 @@
 import { Field, Provable, Struct, ZkProgram } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
-import { addRoundKey } from "./AddRoundKey.js";
-import { shiftRows } from "./ShiftRows.js";
-import { sbox, sbox_byte } from "./SBox.js";
-import { mixColumn } from "./MixColumns.js";
-
-const NUM_ROUNDS = 10;
+import { Byte16 } from "../primitives/Bytes.js";
+import { addRoundKey } from "../lib/AddRoundKey.js";
+import { shiftRows } from "../lib/ShiftRows.js";
+import { sbox, sbox_byte } from "../lib/SBox.js";
+import { mixColumn } from "../lib/MixColumns.js";
+import { NUM_ROUNDS_128 as NUM_ROUNDS } from "../utils/constants.js";
 
 function encrypt(message: Byte16, key: Byte16[]): Byte16 {
   let state = message;

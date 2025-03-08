@@ -1,4 +1,4 @@
-import { Byte16 } from "./primitives/Bytes.js";
+import { Byte16 } from "../primitives/Bytes.js";
 import { AESPublicInput, aesZKProgram, encrypt } from "./run.js";
 
 const { verifyAES128, sboxByte, sbox, mixColumns, shiftRows, addRoundKey } =

@@ -1,5 +1,5 @@
 import { Field } from "o1js";
-import { mixColumn, gmixColumn } from "../src/MixColumns";
+import { mixColumn, gmixColumn } from "../src/lib/MixColumns";
 import { Byte16 } from "../src/primitives/Bytes";
 
 describe("GMixColumns", () => {
