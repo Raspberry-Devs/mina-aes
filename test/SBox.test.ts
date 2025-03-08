@@ -1,6 +1,6 @@
 import { Field } from "o1js";
 import { Byte16 } from "../src/primitives/Bytes";
-import { sbox, sbox_byte } from "../src/SBox";
+import { sbox, sbox_byte } from "../src/lib/SBox";
 import { sbox_arr } from "../src/utils/SBoxArr";
 
 describe("SBox", () => {
