@@ -239,3 +239,17 @@ describe("Byte16 Zero", () => {
     expect(zeroValue.toBigInt().toString(16)).toEqual("0");
   });
 });
+
+describe("Byte16 fromField and toField", () => {
+  it("should correctly convert a Field to a Byte16 instance and back", () => {
+    const field = Field(0xdeadbeef);
+    const byte16Instance = Byte16.fromField(field);
+    const convertedField = byte16Instance.toField();
+    expect(convertedField).toEqual(field);
+
+    const field2 = Field(0x123456789abcdef0n);
+    const byte16Instance2 = Byte16.fromField(field2);
+    const convertedField2 = byte16Instance2.toField();
+    expect(convertedField2).toEqual(field2);
+  });
+});
