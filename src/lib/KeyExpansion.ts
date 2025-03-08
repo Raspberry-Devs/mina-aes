@@ -1,5 +1,5 @@
 import { Field, Gadgets } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
+import { Byte16 } from "../primitives/Bytes.js";
 import { sbox_byte } from "./SBox.js";
 
 // Each word consists of four 8-bit fields.

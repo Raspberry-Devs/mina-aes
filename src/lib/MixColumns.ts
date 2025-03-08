@@ -1,5 +1,5 @@
 import { Field, Gadgets } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
+import { Byte16 } from "../primitives/Bytes.js";
 
 /**
  * Performs the AES MixColumn operation on a 128-bit value.

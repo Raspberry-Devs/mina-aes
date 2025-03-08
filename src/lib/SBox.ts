@@ -1,9 +1,9 @@
 import { Field } from "o1js";
-import { Byte16 } from "./primitives/Bytes.js";
+import { Byte16 } from "../primitives/Bytes.js";
 import {
   affineTransform,
   RijndaelFiniteField,
-} from "./utils/RijndaelFiniteField.js";
+} from "../utils/RijndaelFiniteField.js";
 
 /**
  * Takes in a byte represented as a field and returns the substituted output

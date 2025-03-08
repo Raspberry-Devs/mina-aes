@@ -1,9 +1,9 @@
 import { Provable, Struct, ZkProgram } from "o1js";
 import { Byte16 } from "../primitives/Bytes.js";
-import { shiftRows } from "../ShiftRows.js";
-import { sbox } from "../SBox.js";
-import { mixColumn } from "../MixColumns.js";
-import { addRoundKey } from "../AddRoundKey.js";
+import { shiftRows } from "../lib/ShiftRows.js";
+import { sbox } from "../lib/SBox.js";
+import { mixColumn } from "../lib/MixColumns.js";
+import { addRoundKey } from "../lib/AddRoundKey.js";
 import { NUM_ROUNDS_128 as NUM_ROUNDS } from "../utils/constants.js";
 
 class IterativeAES128PublicInput extends Struct({
@@ -11,6 +11,7 @@ class IterativeAES128PublicInput extends Struct({
 }) {}
 
 // !!!!! Key expansion done off chain !!!!!
+// TODO: Not anymore. Have to implement it!
 export function computeIterativeAes128Encryption(
   message: Byte16,
   key: Byte16[],

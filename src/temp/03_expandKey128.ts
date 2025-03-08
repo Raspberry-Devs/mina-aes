@@ -1,6 +1,6 @@
 import { Provable, Struct, verify, ZkProgram } from "o1js";
 import { Byte16 } from "../primitives/Bytes.js";
-import { expandKey128 } from "../KeyExpansion.js";
+import { expandKey128 } from "../lib/KeyExpansion.js";
 
 class PublicInput extends Struct({
   expandedKey: Provable.Array(Byte16, 11),
