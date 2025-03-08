@@ -11,9 +11,7 @@ describe("SBox", () => {
     ]);
 
     const num = sbox(input);
-    expect(num.toField().toBigInt()).toEqual(
-      0x63636363636363636363636363631d95n,
-    );
+    expect(num.toHex()).toEqual("63636363636363636363636363631d95");
   });
 
   it("generates correct key for 4 bytes input", async () => {
@@ -22,9 +20,7 @@ describe("SBox", () => {
       0xde, 0xad, 0xbe, 0xef,
     ]);
     const num = sbox(input);
-    expect(num.toField().toBigInt()).toEqual(
-      0x6363636363636363636363631d95aedfn,
-    );
+    expect(num.toHex()).toEqual("6363636363636363636363631d95aedf");
   });
 
   it("generates correct key for 16 bytes input", async () => {
@@ -33,9 +29,7 @@ describe("SBox", () => {
       0x0d, 0x0e, 0x0f, 0x10,
     ]);
     const num = sbox(input);
-    expect(num.toField().toBigInt()).toEqual(
-      0x7c777bf26b6fc53001672bfed7ab76can,
-    );
+    expect(num.toHex()).toEqual("7c777bf26b6fc53001672bfed7ab76ca");
   });
 });
 

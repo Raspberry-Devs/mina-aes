@@ -129,3 +129,28 @@ describe("RijndaelFiniteField Inverse", () => {
     expect(Number(result4.toBigInt())).toEqual(0);
   });
 });
+
+describe("RijndaelFiniteField Division", () => {
+  it("should perform division correctly", () => {
+    const a = new RijndaelFiniteField(120n); // 12
+    const b = new RijndaelFiniteField(0b1010n); // 10
+
+    const result = a.div(b);
+    expect(Number(result.toBigInt())).toEqual(12);
+
+    const c = new RijndaelFiniteField(0b1111000n); // 120
+    const d = new RijndaelFiniteField(0xffn); // 255
+    const result2 = c.div(d);
+    expect(Number(result2.toBigInt())).toEqual(215);
+
+    const e = new RijndaelFiniteField(0x0n);
+    const f = new RijndaelFiniteField(0x1n);
+    for (let i = 1; i < 256; i++) {
+      const g = new RijndaelFiniteField(i);
+      expect(Number(e.div(g).toBigInt())).toEqual(0);
+      expect(Number(f.div(g).toBigInt())).toEqual(
+        Number(g.inverse().toBigInt()),
+      );
+    }
+  });
+});
