@@ -4,8 +4,7 @@ import { addRoundKey } from "./AddRoundKey.js";
 import { shiftRows } from "./ShiftRows.js";
 import { sbox, sbox_byte } from "./SBox.js";
 import { mixColumn } from "./MixColumns.js";
-
-const NUM_ROUNDS = 10;
+import { NUM_ROUNDS_128 as NUM_ROUNDS } from "./utils/constants.js";
 
 function encrypt(message: Byte16, key: Byte16[]): Byte16 {
   let state = message;

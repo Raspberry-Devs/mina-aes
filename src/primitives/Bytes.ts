@@ -4,6 +4,7 @@ import { Field, Struct, Gadgets, Provable } from "o1js";
  * Represents a 128-bit field element for AES encryption
  */
 export class Byte16 extends Struct({
+  // TODO: Its not clear which of the nested arrays are columns and which are rows
   value: Provable.Array(Provable.Array(Field, 4), 4),
 }) {
   constructor(value: Field[][]) {

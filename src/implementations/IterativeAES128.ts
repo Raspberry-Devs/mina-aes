@@ -4,8 +4,7 @@ import { shiftRows } from "../ShiftRows.js";
 import { sbox } from "../SBox.js";
 import { mixColumn } from "../MixColumns.js";
 import { addRoundKey } from "../AddRoundKey.js";
-
-const NUM_ROUNDS = 10;
+import { NUM_ROUNDS_128 as NUM_ROUNDS } from "../utils/constants.js";
 
 class IterativeAES128PublicInput extends Struct({
   cipher: Byte16,
