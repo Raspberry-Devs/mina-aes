@@ -1,34 +1,11 @@
-import { Provable, Struct, verify, ZkProgram } from "o1js";
-import { Byte16 } from "../primitives/Bytes.js";
-import { expandKey128 } from "../lib/KeyExpansion.js";
+import { Byte16 } from "../../src/primitives/Bytes";
 
-class PublicInput extends Struct({
-  expandedKey: Provable.Array(Byte16, 11),
-}) {}
-
-const ExpandKey128 = ZkProgram({
-  name: "expand-key",
-  publicInput: PublicInput,
-
-  methods: {
-    expandKey: {
-      privateInputs: [Byte16],
-      async method(publicInput: PublicInput, key: Byte16) {
-        const expansion = expandKey128(key);
-        for (let i = 0; i < 11; i++) {
-          expansion[i].assertEquals(publicInput.expandedKey[i]);
-        }
-      },
-    },
-  },
-});
-
-const key = Byte16.fromBytes([
+export const testKey = Byte16.fromBytes([
   0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09,
   0xcf, 0x4f, 0x3c,
 ]);
 
-const expandedKey: Byte16[] = [
+export const expandedTestKey: Byte16[] = [
   Byte16.fromBytes([
     0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88,
     0x09, 0xcf, 0x4f, 0x3c,
@@ -74,25 +51,3 @@ const expandedKey: Byte16[] = [
     0xb6, 0x63, 0x0c, 0xa6,
   ]),
 ];
-
-const main = async () => {
-  console.log("Compiling ExpandKey128 zkProgram...");
-  const { verificationKey } = await ExpandKey128.compile();
-  console.log("✅ ExpandKey128 zkProgram compiled successfully!");
-
-  console.log("Generating proof...");
-  const publicInput = new PublicInput({
-    expandedKey: expandedKey,
-  });
-  const { proof } = await ExpandKey128.expandKey(publicInput, key);
-  console.log("✅ Proof generated!");
-
-  console.log("Verifying proof locally...");
-  const isValid = await verify(proof, verificationKey);
-
-  console.log(
-    `Proof verification result: ${isValid ? "✅ Valid" : "❌ Invalid"}`,
-  );
-};
-
-main();

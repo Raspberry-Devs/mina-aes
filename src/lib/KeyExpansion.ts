@@ -3,9 +3,8 @@ import { Byte16 } from "../primitives/Bytes.js";
 import { sbox_byte } from "./SBox.js";
 
 // Each word consists of four 8-bit fields.
-type Word = [Field, Field, Field, Field];
+export type Word = [Field, Field, Field, Field];
 const ZeroWord: Word = [Field(0), Field(0), Field(0), Field(0)];
-
 const Rcon: Word[] = [
   [Field(0x01), Field(0x00), Field(0x00), Field(0x00)],
   [Field(0x02), Field(0x00), Field(0x00), Field(0x00)],
@@ -26,7 +25,7 @@ const Rcon: Word[] = [
  * @param b The second 32-bit word.
  * @returns The result of the XOR operation.
  */
-function wordXor(a: Word, b: Word): Word {
+export function wordXor(a: Word, b: Word): Word {
   return [
     Gadgets.xor(a[0], b[0], 8),
     Gadgets.xor(a[1], b[1], 8),
@@ -42,7 +41,7 @@ function wordXor(a: Word, b: Word): Word {
  * @param byte The Byte16 instance to extract words from.
  * @returns An array of four Field elements, each representing a 32-bit word.
  */
-function getWords(byte: Byte16): [Word, Word, Word, Word] {
+export function getWords(byte: Byte16): [Word, Word, Word, Word] {
   return byte.toColumns() as [Word, Word, Word, Word];
 }
 
@@ -53,11 +52,17 @@ function getWords(byte: Byte16): [Word, Word, Word, Word] {
  * @param word The 32-bit Field element to rotate.
  * @returns The rotated 32-bit Field element.
  */
-function rotWord(word: Word): Word {
+export function rotWord(word: Word): Word {
   return [word[1], word[2], word[3], word[0]];
 }
 
-function subWord(word: Word): Word {
+/**
+ * Substitutes each byte of a 32-bit word using the S-box.
+ *
+ * @param word The 32-bit word to substitute.
+ * @returns The substituted 32-bit word.
+ */
+export function subWord(word: Word): Word {
   return word.map((field) => sbox_byte(field)) as Word;
 }
 
