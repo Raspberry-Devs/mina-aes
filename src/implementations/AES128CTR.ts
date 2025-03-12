@@ -1,5 +1,6 @@
 import { Struct, SelfProof, ZkProgram, Field } from "o1js";
 import { Byte16 } from "../primitives/Bytes.js";
+import { computeIterativeAes128Encryption } from "./IterativeAES128.js";
 
 class AES128CTRPublicInput extends Struct({
   cipher: Byte16,
@@ -9,19 +10,17 @@ class AES128CTRPublicInput extends Struct({
   iv: Field,
 }) {}
 
-function dummy_aes(message: Byte16, key: Byte16) {
-  key.assertEquals(key); // fool lint
-  return message; // To be replaced with actual AES implementation
-}
-
 // Cipher under the CTR mode for a single block
 export function computeCipher(
-  nonce: Field, // I don't the right name for this. It's just needs to be some function of iv and ctr. I chose to sum them
+  iv_plus_ctr: Field,
   key: Byte16,
   message: Byte16, // plaintext
 ): Byte16 {
   // Use AES128 just to get the key
-  const curr_key: Byte16 = dummy_aes(key, key); // dummy_aes(Byte16.fromField(nonce), key);
+  const curr_key: Byte16 = computeIterativeAes128Encryption(
+    Byte16.fromField(iv_plus_ctr),
+    key,
+  );
   // compute curr_key by encyrpting counter + iv with key with AES128
   // simply xor with the key to get ciphertext
   return Byte16.xor(message, curr_key);
