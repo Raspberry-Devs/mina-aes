@@ -1,12 +1,31 @@
 # Mina AES
 
-A provable AES implementation using o1js
+A provable AES-128 implementation using [o1js](https://docs.minaprotocol.com/zkapps/o1js).
+
+## Table of Contents
+
+- [Summary](#summary)
+- [Features](#features)
+- [Installation](#installation)
+- [Build](#build)
+- [Formatting and Linting](#formatting-and-linting)
+- [Testing](#testing)
+- [Circuit Breakdown](#circuit-breakdown)
+- [Contributing](#contributing)
+- [License](#license)
+- [Additional Information](#additional-information)
 
 ## Summary
-This is a provable AES-128 implementation using [o1js](https://docs.minaprotocol.com/zkapps/o1js). Documentation can be found [here](https://scaraven.github.io/mina-aes/).
-The repository includes static fixed 128bit message sizes as well as dynamic message sizes with CTR mode of operation (GCM soon to come).
+Mina AES is a community-driven AES-128 implementation built with [o1js](https://docs.minaprotocol.com/zkapps/o1js). It offers a verifiable approach to symmetric encryption, with documentation available [here](https://scaraven.github.io/mina-aes/).
 
-AES (Advanced Encryption Standard) is a symmetric encryption scheme as defind [here](https://csrc.nist.gov/pubs/fips/197/final).
+This work was spawned from the Mina Grant Starter Program and aims to provide a provable AES implementation, enabling users to generate proofs that they have encrypted or decrypted texts with a corresponding key (which is kept secret).
+
+## Features
+
+- AES-128 encryption
+- Static and dynamic message sizes
+- Counter Mode (CTR)
+- Galois Counter Mode (GCM) (coming soon)
 
 ## Installation and Quick Start
 
@@ -56,7 +75,6 @@ To run a summary of constraints in all library functions:
 ```
 npm run build
 node ./build/test/circuitSummary.js
-
 ```
 
 ## Circuit Breakdown
@@ -78,6 +96,12 @@ node ./build/test/circuitSummary.js
 ### Optional:
 
 - User authentication block mode: **Galois Counter Mode (GCM)**.
+
+# Contributing
+Everyone is welcome to contribute, file an issue or submit a pull request if you think there is something worth mentioning.
+
+# License
+This project is licensed under the Apache 2.0 License.
 
 ### Additional Information
 Note that although this code has been tested for correctness, no official audit has been performed to test for implementation vulnerabilities. Please do be careful if using this in your applications.
