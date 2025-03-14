@@ -59,14 +59,26 @@ npm run build
 - **Vision:** Provide a well-documented, robust library for the AES scheme, which can be easily utilized for future development.
 - **Existing Work:** See the current proof-of-concept [here](https://github.com/scaraven/eth-oxford).
 
+## Circuit Breakdown
+
+### AES128 Iterative Summary
+
+| Key          | Value  |
+| ------------ | ------ |
+| Total rows   | 50185  |
+| Generic      | 18617  |
+| Xor16        | 10984  |
+| Zero         | 10984  |
+| Rot64        | 4800   |
+| RangeCheck0  | 4800   |
+
 ## Detailed Breakdown
 
 ### Core:
 
-- Integrating previously completed **ShiftRows** and **MixColumns** stages into the new codebase.
-- Implementing an algorithmic (rather than memory-heavy) **S-Box** or with a provable **Merkle Map**.
-- Key expansion.
-- Padding message text using **PKCS7** (off-circuit).
+- ~~Integrating previously completed **ShiftRows** and **MixColumns** stages into the new codebase.~~
+- ~~Implementing an algorithmic (rather than memory-heavy) **S-Box** or with a provable **Merkle Map**.~~
+- ~~Key expansion.~~
 - Implementing block mode: **Counter Mode (CTR)**.
 - Testing: Since AES is a security primitive, we propose testing with millions of randomly generated inputs and comparing results against an industrial implementation (**Differential Testing**).
 - Creating documentation with libraries such as [documentation.js](https://documentation.js.org/).

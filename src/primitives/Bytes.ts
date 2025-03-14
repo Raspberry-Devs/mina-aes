@@ -4,7 +4,6 @@ import { Field, Struct, Gadgets, Provable } from "o1js";
  * Represents a 128-bit field element for AES encryption
  */
 export class Byte16 extends Struct({
-  // TODO: Its not clear which of the nested arrays are columns and which are rows
   value: Provable.Array(Provable.Array(Field, 4), 4),
 }) {
   constructor(value: Field[][]) {
@@ -42,8 +41,6 @@ export class Byte16 extends Struct({
    *  - Bytes 8–11: Column 2
    *  - Bytes 12–15: Column 3
    *
-   * The left half consists of columns 0 and 1 (first 8 bytes),
-   * and the right half consists of columns 2 and 3 (last 8 bytes).
    *
    * @param bytes An array of 16 numbers, each between 0 and 255.
    * @returns A Byte16 instance.
@@ -87,9 +84,6 @@ export class Byte16 extends Struct({
    * Converts a Byte16 instance into a 4x4 matrix of Field elements (each one byte)
    * in standard AES column‑major order.
    *
-   * The left half (this.left) provides columns 0 and 1,
-   * and the right half (this.right) provides columns 2 and 3.
-   *
    * @returns A 4x4 matrix of Field elements.
    */
   toColumns(): Field[][] {
@@ -98,8 +92,6 @@ export class Byte16 extends Struct({
 
   /**
    * Converts a 4x4 matrix (in column‑major order) into a Byte16 instance.
-   * Assumes that the left two columns (cols[0] and cols[1]) form the left half,
-   * and the right two columns (cols[2] and cols[3]) form the right half.
    *
    * @param cols 4x4 matrix of byte‑sized Field elements.
    * @returns A Byte16 instance.
@@ -189,8 +181,6 @@ export class Byte16 extends Struct({
    * NONPROVABLE: For testing only.
    *
    * The hex string must be 32 characters long.
-   * The first 16 characters (8 bytes) form the left half (columns 0 and 1),
-   * and the last 16 characters form the right half (columns 2 and 3).
    *
    * @param hex A 32-character hex string.
    * @returns A Byte16 instance.
@@ -246,10 +236,6 @@ export class Byte16 extends Struct({
   /**
    * Converts the Byte16 instance into a 32-character hex string.
    * NONPROVABLE: For testing only.
-   *
-   * The output is formed by concatenating:
-   *  - Left half: columns 0 and 1 (8 bytes total)
-   *  - Right half: columns 2 and 3 (8 bytes total)
    *
    * @returns A 32-character hex string.
    */

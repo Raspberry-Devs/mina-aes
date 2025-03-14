@@ -5,6 +5,9 @@ npm-debug.log
 build/
 coverage/
 
+# Ignore docs
+docs/
+
 # Eslint cache
 .eslintcache
 

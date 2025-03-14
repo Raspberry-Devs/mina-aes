@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import crypto, { randomBytes } from "crypto";
 import {
   computeIterativeAes128Encryption,
   IterativeAes128,
@@ -42,6 +42,21 @@ describe("Iterative AES128 Encryption", () => {
     const { plaintext, key } = testVectorToByte16(testVector1);
     const customCipher = computeIterativeAes128Encryption(plaintext, key);
     expect(getCipherText(testVector1)).toBe(customCipher.toHex());
+  });
+
+  it("should match random test vectors", () => {
+    // This produces random test vectors each time, so it's not deterministic
+    for (let i = 0; i < 200; i++) {
+      const tv: TestVector = {
+        plaintextHex: randomBytes(16).toString("hex"),
+        keyHex: randomBytes(16).toString("hex"),
+      };
+
+      const { plaintext, key } = testVectorToByte16(tv);
+
+      const provableCipher = computeIterativeAes128Encryption(plaintext, key);
+      expect(getCipherText(tv)).toBe(provableCipher.toHex());
+    }
   });
 
   (RUN_ZK_TESTS ? it : it.skip)(
