@@ -2,6 +2,12 @@
 
 A provable AES implementation using o1js
 
+## Summary
+This is a provable AES-128 implementation using [o1js](https://docs.minaprotocol.com/zkapps/o1js). Documentation can be found [here](https://scaraven.github.io/mina-aes/).
+The repository includes static fixed 128bit message sizes as well as dynamic message sizes with CTR mode of operation (GCM soon to come).
+
+AES (Advanced Encryption Standard) is a symmetric encryption scheme as defind [here](https://csrc.nist.gov/pubs/fips/197/final).
+
 ## Installation and Quick Start
 
 ### Installation
@@ -49,15 +55,9 @@ To run a summary of constraints in all library functions:
 
 ```
 npm run build
- node ./build/test/circuitSummary.js
+node ./build/test/circuitSummary.js
 
 ```
-
-## Architecture & Design
-
-- **Detailed Design/Architecture:** The proposers currently have a proof-of-concept AES codebase capable of verifying 128-bit ciphertext messages. However, this codebase is a prototype and requires significant modifications, including implementing the [S-Box](https://en.wikipedia.org/wiki/Rijndael_S-box), various block mode of operations (e.g., [CTR](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)), and key expansion to support different key sizes. Additionally, a comprehensive test suite is crucial to ensure correctness during development.
-- **Vision:** Provide a well-documented, robust library for the AES scheme, which can be easily utilized for future development.
-- **Existing Work:** See the current proof-of-concept [here](https://github.com/scaraven/eth-oxford).
 
 ## Circuit Breakdown
 
@@ -72,20 +72,12 @@ npm run build
 | Rot64        | 4800   |
 | RangeCheck0  | 4800   |
 
-## Detailed Breakdown
-
 ### Core:
-
-- ~~Integrating previously completed **ShiftRows** and **MixColumns** stages into the new codebase.~~
-- ~~Implementing an algorithmic (rather than memory-heavy) **S-Box** or with a provable **Merkle Map**.~~
-- ~~Key expansion.~~
 - Implementing block mode: **Counter Mode (CTR)**.
-- Testing: Since AES is a security primitive, we propose testing with millions of randomly generated inputs and comparing results against an industrial implementation (**Differential Testing**).
-- Creating documentation with libraries such as [documentation.js](https://documentation.js.org/).
 
 ### Optional:
 
 - User authentication block mode: **Galois Counter Mode (GCM)**.
-- Additional testing: Deploying on a testnet and running integration tests.
-- Addressing trade-offs between recursion and off-chain computation for an optimized design.
-- Benchmarking: Exploring optimizations to minimize circuit size.
+
+### Additional Information
+Note that although this code has been tested for correctness, no official audit has been performed to test for implementation vulnerabilities. Please do be careful if using this in your applications.
