@@ -1,7 +1,7 @@
 import { Field } from "o1js";
-import { Byte16 } from "../src/primitives/Bytes";
-import { sbox, sboxByte } from "../src/lib/SBox";
-import { sbox_arr } from "../src/utils/SBoxArr";
+import { Byte16 } from "../../src/primitives/Bytes";
+import { sbox, sboxByte } from "../../src/lib/SBox";
+import { sbox_arr } from "../../src/utils/SBoxArr";
 
 describe("SBox", () => {
   it("generates correct key for 2 bytes input", async () => {

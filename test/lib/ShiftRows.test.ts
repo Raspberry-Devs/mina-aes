@@ -1,5 +1,5 @@
-import { Byte16 } from "../src/primitives/Bytes";
-import { shiftRows } from "../src/lib/ShiftRows";
+import { Byte16 } from "../../src/primitives/Bytes";
+import { shiftRows } from "../../src/lib/ShiftRows";
 
 describe("ShiftRows", () => {
   // Taken from FIPS 197, Appendix A.1

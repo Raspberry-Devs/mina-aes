@@ -77,6 +77,7 @@ const IterativeAes128 = ZkProgram({
  * @throws If the message is not 16 characters long or the key is not 32 characters long
  * @throws If the proof generation fails
  */
+// NO TEST NOW AS IT WILL CHANGE SOON
 async function generateIterativeAes128Proof(
   message: string,
   keyHex: string, // Should we allow non hex strings?

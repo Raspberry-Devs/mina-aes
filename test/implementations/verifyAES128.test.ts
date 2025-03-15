@@ -2,9 +2,9 @@ import {
   computeIterativeAes128Encryption,
   IterativeAes128,
   IterativeAES128PublicInput as AESPublicInput,
-} from "../src/implementations/IterativeAES128.js";
-import { encryptAES128 } from "../src/utils/crypto.js";
-import { Byte16 } from "../src/primitives/Bytes.js";
+} from "../../src/implementations/IterativeAES128.js";
+import { encryptAES128 } from "../../src/utils/crypto.js";
+import { Byte16 } from "../../src/primitives/Bytes.js";
 import { verify } from "o1js";
 
 const RUN_ZK_TESTS = process.env.RUN_ZK_TESTS === "true";

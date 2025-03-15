@@ -1,5 +1,5 @@
 import { Field } from "o1js";
-import { Byte16 } from "../src/primitives/Bytes";
+import { Byte16 } from "../../src/primitives/Bytes";
 import { describe, it, expect } from "@jest/globals";
 
 describe("Bytes", () => {

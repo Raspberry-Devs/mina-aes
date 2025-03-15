@@ -3,6 +3,7 @@ import {
   IterativeAes128,
   IterativeAES128PublicInput as AESPublicInput,
 } from "../src/implementations/IterativeAES128.js";
+import { Aes128Ctr } from "../src/implementations/AES128CTR.js";
 import { addRoundKey } from "../src/lib/AddRoundKey.js";
 import { mixColumn } from "../src/lib/MixColumns.js";
 import { sbox, sboxByte } from "../src/lib/SBox.js";
@@ -58,10 +59,19 @@ const main = async () => {
   const { sboxByte, sbox, mixColumns, shiftRows, addRoundKey, expandKey128 } =
     await libZkProgram.analyzeMethods();
   const { verifyAES128 } = await IterativeAes128.analyzeMethods();
+  const { base, inductive } = await Aes128Ctr.analyzeMethods();
 
+  console.log("------------ Implementations Summary ------------");
   console.log("AES128 Iterative Summary:");
   console.log(verifyAES128.summary());
 
+  console.log("AES128CTR Base Summary:");
+  console.log(base.summary());
+
+  console.log("AES128CTR Inductive Summary:");
+  console.log(inductive.summary());
+
+  console.log("------------ Libraries Summary ------------");
   console.log("SBox Summary:");
   console.log(sbox.summary());
 

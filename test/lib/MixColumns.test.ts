@@ -1,6 +1,6 @@
 import { Field } from "o1js";
-import { mixColumn, gmixColumn } from "../src/lib/MixColumns";
-import { Byte16 } from "../src/primitives/Bytes";
+import { mixColumn, gmixColumn } from "../../src/lib/MixColumns";
+import { Byte16 } from "../../src/primitives/Bytes";
 
 describe("GMixColumns", () => {
   // Examples taken from: https://www.samiam.org/mix-column.html
