@@ -1,6 +1,6 @@
 import { Field, Gadgets } from "o1js";
 import { Byte16 } from "../primitives/Bytes.js";
-import { sbox_byte } from "./SBox.js";
+import { sboxByte } from "./SBox.js";
 
 // Each word consists of four 8-bit fields.
 export type Word = [Field, Field, Field, Field];
@@ -63,7 +63,7 @@ export function rotWord(word: Word): Word {
  * @returns The substituted 32-bit word.
  */
 export function subWord(word: Word): Word {
-  return word.map((field) => sbox_byte(field)) as Word;
+  return word.map((field) => sboxByte(field)) as Word;
 }
 
 /**

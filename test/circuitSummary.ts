@@ -5,7 +5,7 @@ import {
 } from "../src/implementations/IterativeAES128.js";
 import { addRoundKey } from "../src/lib/AddRoundKey.js";
 import { mixColumn } from "../src/lib/MixColumns.js";
-import { sbox, sbox_byte } from "../src/lib/SBox.js";
+import { sbox, sboxByte } from "../src/lib/SBox.js";
 import { shiftRows } from "../src/lib/ShiftRows.js";
 import { Byte16 } from "../src/primitives/Bytes.js";
 import { expandKey128 } from "../src/lib/KeyExpansion.js";
@@ -42,7 +42,7 @@ const libZkProgram = ZkProgram({
     sboxByte: {
       privateInputs: [Field],
       async method(input_ignore: AESPublicInput, input: Field) {
-        sbox_byte(input);
+        sboxByte(input);
       },
     },
     expandKey128: {
