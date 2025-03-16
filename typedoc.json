@@ -1,6 +1,6 @@
 {
   "name": "",
-  "entryPoints": ["src/index.ts", "src/lib/*", "src/utils/*"],
+  "entryPoints": ["src/**/*"],
   "exclude": ["build/**/*"],
   "out": "docs"
 }
