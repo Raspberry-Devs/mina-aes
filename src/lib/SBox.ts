@@ -11,7 +11,7 @@ import {
  * @param {Field} input a byte represented within a field
  * @returns {Field} the substituted output
  */
-function sbox_byte(input: Field): Field {
+function sboxByte(input: Field): Field {
   const byte = RijndaelFiniteField.fromField(input);
   const byte_sbox = affineTransform(byte);
   return byte_sbox;
@@ -29,7 +29,7 @@ function sbox(input: Byte16): Byte16 {
   for (let i = 0; i < 4; i++) {
     const arr: Field[] = [];
     for (let j = 0; j < 4; j++) {
-      arr.push(sbox_byte(cols[i][j]));
+      arr.push(sboxByte(cols[i][j]));
     }
     newCols.push(arr);
   }
@@ -37,4 +37,4 @@ function sbox(input: Byte16): Byte16 {
   return Byte16.fromColumns(newCols);
 }
 
-export { sbox, sbox_byte };
+export { sbox, sboxByte };

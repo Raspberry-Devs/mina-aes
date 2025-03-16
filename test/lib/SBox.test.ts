@@ -1,7 +1,7 @@
 import { Field } from "o1js";
-import { Byte16 } from "../src/primitives/Bytes";
-import { sbox, sbox_byte } from "../src/lib/SBox";
-import { sbox_arr } from "../src/utils/SBoxArr";
+import { Byte16 } from "../../src/primitives/Bytes";
+import { sbox, sboxByte } from "../../src/lib/SBox";
+import { sbox_arr } from "../../src/utils/SBoxArr";
 
 describe("SBox", () => {
   it("generates correct key for 2 bytes input", async () => {
@@ -36,18 +36,18 @@ describe("SBox", () => {
 describe("SBox Single Byte", () => {
   it("generates correct key for 1 byte input", () => {
     const input = Field(0x00);
-    const num = sbox_byte(input);
+    const num = sboxByte(input);
     expect(num.toBigInt()).toEqual(0x63n);
 
     const input2 = Field(0x01);
-    const num2 = sbox_byte(input2);
+    const num2 = sboxByte(input2);
     expect(num2.toBigInt()).toEqual(0x7cn);
   });
 
   it("generates correct key with entire table", () => {
     for (let i = 0; i < 256; i++) {
       const input = Field(i);
-      const num = sbox_byte(input);
+      const num = sboxByte(input);
       expect(num.toBigInt()).toEqual(sbox_arr[i].toBigInt());
     }
   });

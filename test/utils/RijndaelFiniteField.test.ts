@@ -1,4 +1,4 @@
-import { RijndaelFiniteField } from "../src/utils/RijndaelFiniteField";
+import { RijndaelFiniteField } from "../../src/utils/RijndaelFiniteField";
 
 describe("RijndaelFiniteField Addition", () => {
   it("should perform XOR-based addition correctly", () => {

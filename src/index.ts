@@ -5,3 +5,4 @@ import {
 import { Byte16 } from "./primitives/Bytes.js";
 
 export { IterativeAes128, IterativeAES128PublicInput, Byte16 };
+export { generateIterativeAes128Proof as generateAes128Proof } from "./implementations/IterativeAES128";
