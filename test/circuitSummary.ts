@@ -3,7 +3,7 @@ import {
   IterativeAes128,
   IterativeAES128PublicInput as AESPublicInput,
 } from "../src/implementations/IterativeAES128.js";
-import { Aes128Ctr } from "../src/implementations/AES128CTR.js";
+import { Aes128Ctr } from "../src/implementations/ctr/ZkProgramCTR.js";
 import { addRoundKey } from "../src/lib/AddRoundKey.js";
 import { mixColumn } from "../src/lib/MixColumns.js";
 import { sbox, sboxByte } from "../src/lib/SBox.js";

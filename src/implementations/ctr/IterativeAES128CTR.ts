@@ -7,8 +7,8 @@ import {
   Void,
   Poseidon,
 } from "o1js";
-import { computeIterativeAes128Encryption } from "./IterativeAES128.js";
-import { Byte16 } from "../primitives/Bytes.js";
+import { computeIterativeAes128Encryption } from "../IterativeAES128.js";
+import { Byte16 } from "../../primitives/Bytes.js";
 
 /**
  * Public input for the AES-128 CTR mode verification circuit.
@@ -37,7 +37,7 @@ const CtrModeIterativeAes128Helper = ZkProgram({
   publicInput: AES128HelperPublicInput,
 
   methods: {
-    verifyAES128: {
+    verifyAESCTRHelper: {
       privateInputs: [Byte16],
 
       async method(input: AES128HelperPublicInput, key: Byte16) {
@@ -92,4 +92,5 @@ export {
   CtrModeIterativeAes128Helper,
   AES128HelperPublicInput,
   verifyIterativeCounterMode,
+  SideLoadedAESProof,
 };
