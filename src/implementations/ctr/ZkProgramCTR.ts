@@ -1,95 +1,50 @@
-import { Provable, Struct, ZkProgram } from "o1js";
 import {
-  SideLoadedAESProof,
-  verifyIterativeCounterMode,
-} from "./IterativeAES128CTR";
+  Field,
+  Poseidon,
+  Provable,
+  Struct,
+  VerificationKey,
+  ZkProgram,
+} from "o1js";
+import { AES128Ctr, SideLoadedAESProof } from "./IterativeAES128CTR";
 import { Byte16 } from "../../primitives/Bytes";
 
-const AES_CTR_256_LENGTH = 2;
+const NUM_BLOCKS = 2;
 
-class CTR128PublicInput extends Struct({
-  cipher: Provable.Array(Byte16, AES_CTR_256_LENGTH),
-  iv: Byte16,
+class AES128CTR256PublicInput extends Struct({
+  proof: SideLoadedAESProof,
+  ciphers: Provable.Array(Byte16, NUM_BLOCKS),
 }) {}
 
-/**
- * A zkProgram that verifies a proof that a 256 bit message was encrypted with AES-128-CTR using the given key.
- */
+// Compile the verification key for AES128CTR
+const { verificationKey: vk_data } = await AES128Ctr.compile();
+const vk = new VerificationKey(vk_data);
+
 const AES128CTR256 = ZkProgram({
-  name: "aes-verify-iterative",
-  publicInput: CTR128PublicInput,
+  name: "aes-verify-ctr-256",
+  publicInput: AES128CTR256PublicInput,
 
   methods: {
-    verifyAES128: {
-      privateInputs: [
-        Provable.Array(SideLoadedAESProof, AES_CTR_256_LENGTH),
-        Provable.Array(Byte16, AES_CTR_256_LENGTH),
-        Byte16,
-      ],
+    verifyAESCTR256: {
+      privateInputs: [],
 
-      async method(
-        pub_input: CTR512PublicInput,
-        proofs: SideLoadedAESProof[],
-        message: Byte16[],
-        key: Byte16,
-      ) {
-        verifyIterativeCounterMode(
-          proofs,
-          pub_input.cipher,
-          message,
-          key,
-          pub_input.iv.toField(),
+      async method(input: AES128CTR256PublicInput) {
+        input.proof.verify(vk);
+        input.proof.publicInput.ctr.assertEquals(NUM_BLOCKS - 1);
+
+        // Verify the ciphers
+        const cipher_internal_hash = Poseidon.hashPacked(
+          Provable.Array(Field, NUM_BLOCKS),
+          [
+            Poseidon.hashPacked(Byte16, input.ciphers[0]),
+            Poseidon.hashPacked(Byte16, input.ciphers[1]),
+          ],
         );
+
+        cipher_internal_hash.assertEquals(input.proof.publicOutput.cipher_hash);
       },
     },
   },
 });
 
-const AES_CTR_512_LENGTH = 4;
-
-class CTR512PublicInput extends Struct({
-  cipher: Provable.Array(Byte16, AES_CTR_256_LENGTH),
-  iv: Byte16,
-}) {}
-
-/**
- * A zkProgram that verifies a proof that a 512 bit message was encrypted with AES-128-CTR using the given key.
- */
-const AE512CTR256 = ZkProgram({
-  name: "aes-verify-iterative",
-  publicInput: CTR512PublicInput,
-
-  methods: {
-    verifyAES128: {
-      privateInputs: [
-        Provable.Array(SideLoadedAESProof, AES_CTR_512_LENGTH),
-        Provable.Array(Byte16, AES_CTR_512_LENGTH),
-        Byte16,
-      ],
-
-      async method(
-        pub_input: CTR512PublicInput,
-        proofs: SideLoadedAESProof[],
-        message: Byte16[],
-        key: Byte16,
-      ) {
-        verifyIterativeCounterMode(
-          proofs,
-          pub_input.cipher,
-          message,
-          key,
-          pub_input.iv.toField(),
-        );
-      },
-    },
-  },
-});
-
-export {
-  AES128CTR256,
-  CTR128PublicInput,
-  AES_CTR_256_LENGTH,
-  CTR512PublicInput,
-  AE512CTR256,
-  AES_CTR_512_LENGTH,
-};
+export { AES128CTR256, AES128CTR256PublicInput, SideLoadedAESProof };
