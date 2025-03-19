@@ -47,4 +47,4 @@ const AES128CTR256 = ZkProgram({
   },
 });
 
-export { AES128CTR256, AES128CTR256PublicInput, SideLoadedAESProof };
+export { AES128CTR256, AES128CTR256PublicInput };
