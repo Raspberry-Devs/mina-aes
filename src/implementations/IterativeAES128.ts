@@ -67,6 +67,31 @@ const IterativeAes128 = ZkProgram({
   },
 });
 
+class IterativeAES128MessagePublicInput extends Struct({
+  cipher: Byte16,
+  message: Byte16,
+}) {}
+
+/**
+ * A zkProgram that verifies a proof that a message and cipher are conncted via AES-128 using the given key.
+ */
+const IterativeAes128MessagePublic = ZkProgram({
+  name: "aes-verify-iterative-decrypt",
+  publicInput: IterativeAES128MessagePublicInput,
+
+  methods: {
+    verifyAES128: {
+      privateInputs: [Byte16],
+
+      async method(input: IterativeAES128MessagePublicInput, key: Byte16) {
+        const message = input.message;
+        const state = computeIterativeAes128Encryption(message, key);
+        state.assertEquals(input.cipher);
+      },
+    },
+  },
+});
+
 /**
  * Generates a proof that the given message was encrypted with AES-128 using the given key.
  * The key must be in hex form.
@@ -77,7 +102,6 @@ const IterativeAes128 = ZkProgram({
  * @throws If the message is not 16 characters long or the key is not 32 characters long
  * @throws If the proof generation fails
  */
-// NO TEST NOW AS IT WILL CHANGE SOON
 async function generateIterativeAes128Proof(
   message: string,
   keyHex: string, // Should we allow non hex strings?
@@ -107,4 +131,6 @@ export {
   generateIterativeAes128Proof,
   IterativeAes128,
   IterativeAES128PublicInput,
+  IterativeAes128MessagePublic,
+  IterativeAES128MessagePublicInput,
 };

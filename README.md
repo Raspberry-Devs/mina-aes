@@ -24,8 +24,6 @@ This work was spawned from the Mina Grant Starter Program and aims to provide a 
 
 - AES-128 encryption
 - Static and dynamic message sizes
-- Counter Mode (CTR)
-- Galois Counter Mode (GCM) (coming soon)
 
 ## Installation and Quick Start
 
@@ -77,6 +75,14 @@ npm run build
 node ./build/test/circuitSummary.js
 ```
 
+## Code Breakdown
+The main entrypoint of the code is contained within `src/implementations/IterativeAES128.ts` which has the following implemented.
+    - `IterativeAes128` is responsible for verifying that a cipher has been encrypted using AES with an arbitrary key and message
+    - `IterativeAes128MessagePublic` is responsible for verifying that a cipher **and** a message have been encrypted using AES with an arbitrary key.
+    - `computeIterativeAes128Encryption()` which can be inlined within circuits in order to proof AES encryption.
+
+Additionally, `Byte16` is used to represent 256-bit numbers and is commonly used as inputs to functions and circuits.
+
 ## Circuit Breakdown
 
 ### AES128 Iterative Summary
@@ -89,13 +95,6 @@ node ./build/test/circuitSummary.js
 | Zero         | 10984  |
 | Rot64        | 4800   |
 | RangeCheck0  | 4800   |
-
-### Core:
-- Implementing block mode: **Counter Mode (CTR)**.
-
-### Optional:
-
-- User authentication block mode: **Galois Counter Mode (GCM)**.
 
 # Contributing
 Everyone is welcome to contribute, file an issue or submit a pull request if you think there is something worth mentioning.
