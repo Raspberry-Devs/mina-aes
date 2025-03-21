@@ -2,6 +2,8 @@ import {
   computeIterativeAes128Encryption,
   IterativeAes128,
   IterativeAES128PublicInput as AESPublicInput,
+  IterativeAes128MessagePublic,
+  IterativeAES128MessagePublicInput,
 } from "../../src/implementations/IterativeAES128.js";
 import { encryptAES128 } from "../../src/utils/crypto.js";
 import { Byte16 } from "../../src/primitives/Bytes.js";
@@ -46,6 +48,27 @@ describe("Iterative AES128 Encryption", () => {
       const { proof } = await IterativeAes128.verifyAES128(
         input,
         plaintext,
+        key,
+      );
+      const isValid = await verify(proof, verificationKey);
+      expect(isValid).toBe(true);
+    },
+  );
+});
+
+describe("Iterative AES128 Decryption", () => {
+  (RUN_ZK_TESTS ? it : it.skip)(
+    "should verify the proof using the zkProgram",
+    async () => {
+      const { verificationKey } = await IterativeAes128MessagePublic.compile();
+      const { plaintext, key } = testVectorToByte16(testVector1);
+      const cipher = Byte16.fromHex(getCipherText(testVector1));
+      const input = new IterativeAES128MessagePublicInput({
+        cipher,
+        message: plaintext,
+      });
+      const { proof } = await IterativeAes128MessagePublic.verifyAES128(
+        input,
         key,
       );
       const isValid = await verify(proof, verificationKey);
