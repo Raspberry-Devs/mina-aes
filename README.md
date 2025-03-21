@@ -83,6 +83,20 @@ The main entrypoint of the code is contained within `src/implementations/Iterati
 
 Additionally, `Byte16` is used to represent 256-bit numbers and is commonly used as inputs to functions and circuits.
 
+### Why is there no decryption function?!
+The beauty of verifying AES with zk-proofs is that decryption and encryption can both be done with "encryption" under the hood. For example, if you wanted to build a function `AESDecrypt()` using `computeIterativeAes128Encryption()` then you can use witnesses as follows:
+```typescript
+function decrypt(key: Byte16, cipher: Byte16) {
+    const plaintext = Provable.witness(Byte16, () => {YOUR_OUT_OF_CIRCUIT_FUNCTION_DECRYPTION_HERE});
+    const cipher_internal = computeIterativeAes128Encryption(plaintext, key);
+    cipher_internal.assertEquals(cipher);
+
+    return cipher
+}
+```
+
+The main reason why we didn't explicitly create AES decryption is twofold. Foremost, decreasing the amount of code implemented decreases the attack surface for vulnerabilities and bugs. Additionally, AES decryption requires more constraints due to `MixColumns` and `SBox` operations becoming slightly more expensive. 
+
 ## Circuit Breakdown
 
 ### AES128 Iterative Summary
