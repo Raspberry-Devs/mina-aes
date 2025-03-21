@@ -6,6 +6,9 @@ import { Field, Struct, Gadgets, Provable } from "o1js";
 export class Byte16 extends Struct({
   value: Provable.Array(Provable.Array(Field, 4), 4),
 }) {
+  gcmMul(other: Byte16): Byte16 {
+    throw new Error(other.toString());
+  }
   constructor(value: Field[][]) {
     super({ value });
   }
@@ -138,6 +141,10 @@ export class Byte16 extends Struct({
     // Check that the field is equal to the Byte16 value.
     byte16.toField().assertEquals(field);
     return byte16;
+  }
+
+  static fromTwoFields(field1: Field, field2: Field): Byte16 {
+    throw new Error(field1.toString() + field2.toString());
   }
 
   /**
