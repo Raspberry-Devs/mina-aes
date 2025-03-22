@@ -16,17 +16,17 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
     return new GcmFiniteField([top, bot, Field(0n)]);
   }
 
-  shiftRight1(): GcmFiniteField {
-    const top = this.toFields()[0];
-    let bot = this.toFields()[1];
-    const rShiftBot = Gadgets.rightShift64(bot, 1);
-    bot = Provable.if(
-      Gadgets.and(top, Field(1), 64).equals(Field(1)),
-      Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
-      rShiftBot,
-    );
-    return GcmFiniteField.fromTwoFields(Gadgets.rightShift64(top, 1), bot);
-  }
+  // shiftRight1(): GcmFiniteField {
+  //   const top = this.toFields()[0];
+  //   let bot = this.toFields()[1];
+  //   const rShiftBot = Gadgets.rightShift64(bot, 1);
+  //   bot = Provable.if(
+  //     Gadgets.and(top, Field(1), 64).equals(Field(1)),
+  //     Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
+  //     rShiftBot,
+  //   );
+  //   return GcmFiniteField.fromTwoFields(Gadgets.rightShift64(top, 1), bot);
+  // }
   /**
    * Perform mult operation in GF(2^128).
    * Specifically, this field is interpreted as a polynomial in GF(2). Each bit represents a coefficients.
@@ -52,13 +52,29 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
           Gadgets.rightShift64(yTop, 64 - i - 1),
           64,
         ).equals(Field(1)),
+        GcmFiniteField,
         GcmFiniteField.xor(z, v),
         z,
       );
-      const rshV = v.shiftRight1();
+      //--------- shiftRight1 start---------------
+      // const rshV = v.shiftRight1();
+      const top = v.toFields()[0];
+      let bot = v.toFields()[1];
+      const rShiftBot = Gadgets.rightShift64(bot, 1);
+      bot = Provable.if(
+        Gadgets.and(top, Field(1), 64).equals(Field(1)),
+        Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
+        rShiftBot,
+      );
+      const rshV = GcmFiniteField.fromTwoFields(
+        Gadgets.rightShift64(top, 1),
+        bot,
+      );
+      //--------- shiftRight1 end---------------
       const vBot = v.toFields()[1];
       v = Provable.if(
         Gadgets.and(Field(1), vBot, 64).equals(Field(1)),
+        GcmFiniteField,
         rshV,
         GcmFiniteField.xor(rshV, R),
       );
@@ -71,72 +87,35 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
           Gadgets.rightShift64(yBot, 64 - i - 1),
           64,
         ).equals(Field(1)),
+        GcmFiniteField,
         GcmFiniteField.xor(z, v),
         z,
       );
-      const rshV = v.shiftRight1();
+      //--------- shiftRight1 start---------------
+      // const rshV = v.shiftRight1();
+      const top = v.toFields()[0];
+      let bot = v.toFields()[1];
+      const rShiftBot = Gadgets.rightShift64(bot, 1);
+      bot = Provable.if(
+        Gadgets.and(top, Field(1), 64).equals(Field(1)),
+        Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
+        rShiftBot,
+      );
+      const rshV = GcmFiniteField.fromTwoFields(
+        Gadgets.rightShift64(top, 1),
+        bot,
+      );
+      //--------- shiftRight1 end---------------
       const vBot = v.toFields()[1];
       v = Provable.if(
         Gadgets.and(Field(1), vBot, 64).equals(Field(1)),
+        GcmFiniteField,
         rshV,
         GcmFiniteField.xor(rshV, R),
       );
     }
     return z;
   }
-  // /**
-  //  * Multiply a Gcm number by x (represented as 2 in the field)
-  //  * @param {Field} a
-  //  * @returns {Field}
-  //  */
-  // static _multOne(a: Field): Field {
-  //   // Check whether the high bit is set
-  //   const highBitSet = Gadgets.and(
-  //     Gadgets.rightShift64(a, BYTE_SIZE - 1),
-  //     Field(1),
-  //     1,
-  //   );
-
-  //   // Shift left by one
-  //   const shifted = a.mul(2);
-  //   // Save an AND gate by adding the high bit to the mask
-  //   const mask = Field(0b100011011).mul(highBitSet);
-
-  //   // XOR with the mask, zeroes out high bit if it was set
-  //   const result = Gadgets.xor(shifted, mask, BYTE_SIZE + 1);
-  //   return result;
-  // }
-
-  // /**
-  //  * Add two Gcm numbers together, this is equivalent to an xor operation
-  //  * @param {GcmFiniteField} other
-  //  * @returns {GcmFiniteField}
-  //  */
-  // add(other: GcmFiniteField): GcmFiniteField {
-  //   // Addition in Gcm's field is equivalent to bitwise XOR
-  //   return GcmFiniteField.xor(this, other);
-  // }
-
-  // /**
-  //  * Computes the inverse of the current value, the inverse always satisifes the relationship p * (p^-1) = 1
-  //  * @returns {GcmFiniteField}
-  //  */
-  // inverse(): GcmFiniteField {
-  //   const inv = Provable.witness(Field, () => {
-  //     const out = inv_box[Number(this.toFields()[0])];
-  //     return Field(out);
-  //   });
-
-  //   const r_inv = GcmFiniteField.fromField(inv);
-
-  //   // If inv is 0, then the inverse is 0, otherwise it is 1
-  //   const isOne = inv.toFields()[0].equals(0).not();
-
-  //   // Add constraint that the inverse is correct
-  //   r_inv.mult(this).toFields()[0].assertEquals(isOne.toField());
-
-  //   return r_inv;
-  // }
 
   /**
    * Performs bitwise xor used in Gcm addition
