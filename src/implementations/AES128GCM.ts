@@ -45,7 +45,7 @@ export function computeCipher(
 }
 
 const Aes128Gcm = ZkProgram({
-  name: "aes-verify-iterative",
+  name: "aes-verify-gcm",
   publicInput: AES128GCMPublicInput,
   publicOutput: AES128GCMPublicOutput, // The counter
 

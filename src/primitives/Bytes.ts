@@ -1,4 +1,5 @@
 import { Field, Struct, Gadgets, Provable } from "o1js";
+import { GcmFiniteField } from "../utils/GcmFiniteField.js";
 
 /**
  * Represents a 128-bit field element for AES encryption
@@ -7,7 +8,12 @@ export class Byte16 extends Struct({
   value: Provable.Array(Provable.Array(Field, 4), 4),
 }) {
   gcmMul(other: Byte16): Byte16 {
-    throw new Error(other.toString());
+    const { top: aTop, bot: aBot } = this.toTwoFields();
+    const a = GcmFiniteField.fromTwoFields(aTop, aBot);
+    const { top: bTop, bot: bBot } = other.toTwoFields();
+    const b = GcmFiniteField.fromTwoFields(bTop, bBot);
+    const result = GcmFiniteField.mul(a, b);
+    return Byte16.fromTwoFields(result.toFields()[0], result.toFields()[1]);
   }
   constructor(value: Field[][]) {
     super({ value });
@@ -143,8 +149,48 @@ export class Byte16 extends Struct({
     return byte16;
   }
 
-  static fromTwoFields(field1: Field, field2: Field): Byte16 {
-    throw new Error(field1.toString() + field2.toString());
+  toTwoFields(): { top: Field; bot: Field } {
+    let top = Field(0);
+    for (let i = 0; i < Byte16.COL_SIZE / 2; i++) {
+      for (let j = 0; j < Byte16.COL_SIZE; j++) {
+        const byte = this.value[i][j];
+        // Compute the exponent for this byte.
+        const exponent =
+          (Byte16.COL_SIZE - i - 1) * Byte16.COL_SIZE +
+          (Byte16.COL_SIZE - j - 1);
+        // The factor is 256^exponent.
+        const factor = Field(256 ** exponent);
+        top = top.add(byte.mul(factor));
+      }
+    }
+    let bot = Field(0);
+    for (let i = 0; i < Byte16.COL_SIZE / 2; i++) {
+      for (let j = 0; j < Byte16.COL_SIZE; j++) {
+        const byte = this.value[i + Byte16.COL_SIZE / 2][j];
+        // Compute the exponent for this byte.
+        const exponent =
+          (Byte16.COL_SIZE - i - 1) * Byte16.COL_SIZE +
+          (Byte16.COL_SIZE - j - 1);
+        // The factor is 256^exponent.
+        const factor = Field(256 ** exponent);
+        bot = bot.add(byte.mul(factor));
+      }
+    }
+    return { top, bot };
+  }
+
+  static fromTwoFields(aField: Field, bField: Field): Byte16 {
+    // Create Byte16 as witness and verify equality with the field.
+    const byte16 = Provable.witness(Byte16, () => {
+      return Byte16.fromBigInt((aField.toBigInt() << 64n) | bField.toBigInt());
+    });
+
+    // extract top and bottom
+    const { top, bot } = byte16.toTwoFields();
+    // Check that the field is equal to the Byte16 value.
+    top.assertEquals(aField);
+    bot.assertEquals(bField);
+    return byte16;
   }
 
   /**
