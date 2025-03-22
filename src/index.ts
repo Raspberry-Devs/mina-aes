@@ -3,7 +3,7 @@ import {
   IterativeAES128PublicInput,
   IterativeAes128MessagePublic,
   IterativeAES128MessagePublicInput,
-} from "./implementations/IterativeAES128";
+} from "./implementations/IterativeAES128.js";
 import { Byte16 } from "./primitives/Bytes.js";
 
 export {
@@ -13,4 +13,4 @@ export {
   IterativeAes128MessagePublic,
   IterativeAES128MessagePublicInput,
 };
-export { generateIterativeAes128Proof as generateAes128Proof } from "./implementations/IterativeAES128";
+export { generateIterativeAes128Proof as generateAes128Proof } from "./implementations/IterativeAES128.js";
