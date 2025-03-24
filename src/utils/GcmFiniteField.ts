@@ -16,17 +16,30 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
     return new GcmFiniteField([top, bot, Field(0n)]);
   }
 
-  // shiftRight1(): GcmFiniteField {
-  //   const top = this.toFields()[0];
-  //   let bot = this.toFields()[1];
-  //   const rShiftBot = Gadgets.rightShift64(bot, 1);
-  //   bot = Provable.if(
-  //     Gadgets.and(top, Field(1), 64).equals(Field(1)),
-  //     Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
-  //     rShiftBot,
-  //   );
-  //   return GcmFiniteField.fromTwoFields(Gadgets.rightShift64(top, 1), bot);
-  // }
+  shiftRight1(): GcmFiniteField {
+    const top = this.toFields()[0];
+    let bot = this.toFields()[1];
+    const rShiftBot = Gadgets.rightShift64(bot, 1);
+    bot = Provable.if(
+      Gadgets.and(top, Field(1), 64).equals(Field(1)),
+      Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
+      rShiftBot,
+    );
+    return GcmFiniteField.fromTwoFields(Gadgets.rightShift64(top, 1), bot);
+  }
+
+  /**
+   * A special case of Proveable.if: works only on GCMFiniteField
+   * Returns 0 if bool is 0, else does not change the value (identity)
+   * @param bool A field but expected to be 0 or 1 (otherwise undefined behavior)
+   * @returns
+   */
+  idIf1(bool: Field): GcmFiniteField {
+    const top = this.toFields()[0];
+    const bot = this.toFields()[1];
+    return new GcmFiniteField([top.mul(bool), bot.mul(bool), Field(0n)]);
+  }
+
   /**
    * Perform mult operation in GF(2^128).
    * Specifically, this field is interpreted as a polynomial in GF(2). Each bit represents a coefficients.
@@ -38,81 +51,26 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
   static mul(x: GcmFiniteField, y: GcmFiniteField): GcmFiniteField {
     // Apparently this is a particular polynomial GCM uses
     const R: GcmFiniteField = GcmFiniteField.fromTwoFields(
-      Field(0xe100000000000000),
+      Field(0xe100000000000000n),
       Field(0),
     );
-    let z = GcmFiniteField.fromTwoFields(Field(0), Field(0));
+    let z: GcmFiniteField = GcmFiniteField.fromTwoFields(Field(0), Field(0));
     let v = x;
     const yTop = y.toFields()[0];
     const yBot = y.toFields()[1];
-    for (let i = 0; i < 64; ++i) {
-      z = Provable.if(
-        Gadgets.and(
-          Field(1),
-          Gadgets.rightShift64(yTop, 64 - i - 1),
-          64,
-        ).equals(Field(1)),
-        GcmFiniteField,
-        GcmFiniteField.xor(z, v),
-        z,
+    for (let i = 0; i < 128; ++i) {
+      const yHalf = i < 64 ? yTop : yBot;
+      const bool1: Field = Gadgets.and(
+        Field(1),
+        Gadgets.rightShift64(yHalf, 64 - (i % 2) - 1),
+        64,
       );
-      //--------- shiftRight1 start---------------
-      // const rshV = v.shiftRight1();
-      const top = v.toFields()[0];
-      let bot = v.toFields()[1];
-      const rShiftBot = Gadgets.rightShift64(bot, 1);
-      bot = Provable.if(
-        Gadgets.and(top, Field(1), 64).equals(Field(1)),
-        Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
-        rShiftBot,
-      );
-      const rshV = GcmFiniteField.fromTwoFields(
-        Gadgets.rightShift64(top, 1),
-        bot,
-      );
-      //--------- shiftRight1 end---------------
+      z = GcmFiniteField.xor(z, v.idIf1(bool1));
+      const rshV = v.shiftRight1();
       const vBot = v.toFields()[1];
-      v = Provable.if(
-        Gadgets.and(Field(1), vBot, 64).equals(Field(1)),
-        GcmFiniteField,
-        rshV,
-        GcmFiniteField.xor(rshV, R),
-      );
-    }
-    for (let i = 0; i < 64; ++i) {
-      // Only difference from above is use y.bot instead of y.top
-      z = Provable.if(
-        Gadgets.and(
-          Field(1),
-          Gadgets.rightShift64(yBot, 64 - i - 1),
-          64,
-        ).equals(Field(1)),
-        GcmFiniteField,
-        GcmFiniteField.xor(z, v),
-        z,
-      );
-      //--------- shiftRight1 start---------------
-      // const rshV = v.shiftRight1();
-      const top = v.toFields()[0];
-      let bot = v.toFields()[1];
-      const rShiftBot = Gadgets.rightShift64(bot, 1);
-      bot = Provable.if(
-        Gadgets.and(top, Field(1), 64).equals(Field(1)),
-        Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
-        rShiftBot,
-      );
-      const rshV = GcmFiniteField.fromTwoFields(
-        Gadgets.rightShift64(top, 1),
-        bot,
-      );
-      //--------- shiftRight1 end---------------
-      const vBot = v.toFields()[1];
-      v = Provable.if(
-        Gadgets.and(Field(1), vBot, 64).equals(Field(1)),
-        GcmFiniteField,
-        rshV,
-        GcmFiniteField.xor(rshV, R),
-      );
+      // .sub(1).neg() is a boolean not operation
+      const bool2: Field = Gadgets.and(Field(1), vBot, 64).sub(1).neg();
+      v = GcmFiniteField.xor(rshV, R.idIf1(bool2));
     }
     return z;
   }
