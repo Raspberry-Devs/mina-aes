@@ -1,5 +1,5 @@
 import { createForeignField, Field, Gadgets, Provable } from "o1js";
-import { GCM_FINITE_SIZE } from "./constants.js";
+import { GCM_FINITE_SIZE, HALF_SIZE } from "./constants.js";
 
 /**
  * A Finite Field which implements {@link https://en.wikipedia.org/wiki/Finite_field_arithmetic#Gcm's_(AES)_finite_field Rijndael's Finite Field} operations.
@@ -22,7 +22,7 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
     const rShiftBot = Gadgets.rightShift64(bot, 1);
     bot = Provable.if(
       Gadgets.and(top, Field(1), 64).equals(Field(1)),
-      Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
+      Gadgets.or(Field(0x8000000000000000n), rShiftBot, 64),
       rShiftBot,
     );
     return GcmFiniteField.fromTwoFields(Gadgets.rightShift64(top, 1), bot);
@@ -39,6 +39,8 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
     const bot = this.toFields()[1];
     return new GcmFiniteField([top.mul(bool), bot.mul(bool), Field(0n)]);
   }
+
+  // x = 0b10, y = 0b10...01
 
   /**
    * Perform mult operation in GF(2^128).
@@ -58,19 +60,17 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
     let v = x;
     const yTop = y.toFields()[0];
     const yBot = y.toFields()[1];
-    for (let i = 0; i < 128; ++i) {
-      const yHalf = i < 64 ? yTop : yBot;
+    for (let i = 0; i < GCM_FINITE_SIZE; ++i) {
+      const yHalf = i < HALF_SIZE ? yTop : yBot;
       const bool1: Field = Gadgets.and(
         Field(1),
-        Gadgets.rightShift64(yHalf, 64 - (i % 2) - 1),
+        Gadgets.rightShift64(yHalf, HALF_SIZE - (i % HALF_SIZE) - 1),
         64,
       );
       z = GcmFiniteField.xor(z, v.idIf1(bool1));
-      const rshV = v.shiftRight1();
       const vBot = v.toFields()[1];
-      // .sub(1).neg() is a boolean not operation
-      const bool2: Field = Gadgets.and(Field(1), vBot, 64).sub(1).neg();
-      v = GcmFiniteField.xor(rshV, R.idIf1(bool2));
+      const bool2: Field = Gadgets.and(Field(1), vBot, 64);
+      v = GcmFiniteField.xor(v.shiftRight1(), R.idIf1(bool2));
     }
     return z;
   }
