@@ -170,4 +170,4 @@ const Aes128Gcm = ZkProgram({
   },
 });
 
-export { Aes128Gcm, AES128GCMPublicInput };
+export { Aes128Gcm, AES128GCMPublicInput, AES128GCMPublicOutput };
