@@ -98,7 +98,9 @@ function decrypt(key: Byte16, cipher: Byte16) {
 The main reason why we didn't explicitly create AES decryption is twofold. Foremost, decreasing the amount of code implemented decreases the attack surface for vulnerabilities and bugs. Additionally, AES decryption requires more constraints due to `MixColumns` and `SBox` operations becoming slightly more expensive.
 
 ### SBox Implementation with Rijndael's Finite Field
-Static lookup arrays are not very zk-friendly constructs as such arrays cannot be dynamically accessed. This means that the SBox step within the AES encryption scheme becomes very expensive as we have to either iterate through all values in our SBox array (256 values to lookup x 16 bytes per block x 11 rounds = 45056 lookups for one block encryption ~ 100,000 constraints) or generate SBox values on the fly. AES' sbox uses Rijndael's Finite Field to perform non-linear substitution which we have implemented. This allows us to drop the number of constraints by over a half (~40,000 constraints).
+When the project started, o1js did not have any support for dynamic table lookups. This means that the SBox step within the AES encryption scheme becomes very expensive as we have to either iterate through all values in our SBox array (256 values to lookup x 16 bytes per block x 11 rounds = 45056 lookups for one block encryption ~ 100,000 constraints) or generate SBox values on the fly. AES' sbox uses Rijndael's Finite Field to perform non-linear substitution which we have implemented. This allows us to drop the number of constraints by over a half (~40,000 constraints).
+
+**NOTE**: o1js has recently added support for static and dynamic-sized arrays in zk-circuits. This would allow the Rijndael Finite Field implementation to be completely skipped with the use of a lookup table. As this repository is a POC, we do not plan to modify the implementation. However, more efficient implementation contributions are welcome!
 
 ## Circuit Breakdown
 
